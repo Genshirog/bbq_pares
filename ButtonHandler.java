@@ -1,7 +1,7 @@
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -51,6 +51,7 @@ public class ButtonHandler implements ActionListener{
         JButton save = new JButton("Save");
         JButton clear = new JButton("Clear");
         for(int i = 0; i < 5; i++){
+            labels[i].setFont(new Font("Arial", Font.BOLD, 20));
             inputPanel.add(labels[i]);
             inputPanel.add(texts[i]);
         }
@@ -133,7 +134,6 @@ public class ButtonHandler implements ActionListener{
     
     private JPanel EsearchHeader(JComboBox<String> employeeDropDown) {
         JPanel searchBox = new JPanel();
-        searchBox.setBackground(Color.yellow);
         JLabel label = new JLabel("Search By: ");
         employeeDropDown.setPreferredSize(new Dimension(200, 50));
     
@@ -145,7 +145,6 @@ public class ButtonHandler implements ActionListener{
     
     private JPanel Esearchinputs(JTextField input) {
         JPanel searchBox = new JPanel();
-        searchBox.setBackground(Color.blue);
         JLabel searchLabel = new JLabel("Search: ");
     
         searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
@@ -155,7 +154,6 @@ public class ButtonHandler implements ActionListener{
     }
     private JPanel Esearchbtn(JComboBox<String> employee, JTextField input){
         JPanel searchBox = new JPanel();
-        searchBox.setBackground(Color.green);
         JButton search = new JButton("Search");
         search.addActionListener(new ActionListener() {
             @Override
@@ -403,6 +401,98 @@ public class ButtonHandler implements ActionListener{
         inputPanel.revalidate();
         inputPanel.repaint();
     }
+
+    //End of Employee
+    //Start of Role
+    private void RcreateFields() {
+        inputPanel.removeAll(); 
+        inputPanel.setLayout(new GridLayout(4, 2, 50, 50));
+        
+        JLabel rname = new JLabel("Role Name:");
+        JTextField rtext = new JTextField();
+        JLabel descript = new JLabel("Description:");
+        JTextArea descriptArea = new JTextArea();
+        descriptArea.setLineWrap(true);
+        descriptArea.setWrapStyleWord(true);
+        JScrollPane scrollDesc = new JScrollPane(descriptArea);
+        scrollDesc.setPreferredSize(new Dimension(80,100));
+        scrollDesc.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollDesc.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollDesc.setPreferredSize(new Dimension(200, 100));
+        JLabel shift = new JLabel("Shift(Day/Night):");
+        JTextField stext = new JTextField();
+        JLabel[] labels = {rname,descript,shift};
+        JButton save = new JButton("Save");
+        JButton clear = new JButton("Clear");
+        for(int i = 0; i < 3; i++){
+            labels[i].setFont(new Font("Arial", Font.BOLD, 20));
+        }
+        JTextField[] texts = {rtext,stext};
+        inputPanel.add(rname);
+        inputPanel.add(rtext);
+        inputPanel.add(descript);
+        inputPanel.add(scrollDesc);
+        inputPanel.add(shift);
+        inputPanel.add(stext);
+        inputPanel.add(save);
+        inputPanel.add(clear);
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                try {
+                    Connection conn = Database.getConnection();
+
+                    String getLastID = "SELECT JobRoleID FROM job_role ORDER BY JobRoleID DESC LIMIT 1";
+                    PreparedStatement getLastStmt = conn.prepareStatement(getLastID);
+                    ResultSet rs = getLastStmt.executeQuery();
+
+                    String newJobRoleID = "R001";
+                    if (rs.next()) {
+                        String lastID = rs.getString("JobRoleID");
+                        int lastNum = Integer.parseInt(lastID.substring(1));
+                        newJobRoleID = String.format("R%03d", lastNum + 1);
+                    }
+                    rs.close();
+                    getLastStmt.close();
+                    String sql = "INSERT INTO job_role(JobRoleID,role_name,role_description,role_shift) VALUES(?,?,?,?,)";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setString(1, newJobRoleID);
+                    stmt.setString(2, rtext.getText());
+                    stmt.setString(3, descriptArea.getText());
+                    stmt.setString(4, shift.getText());
+                    stmt.executeUpdate();
+                    for(JTextField text : texts){
+                        text.setText("");
+                    }
+                    descriptArea.setText("");
+                stmt.close();
+                conn.close();
+                if (refreshable != null) {
+                    refreshable.refreshTable();  // Add this!
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(inputPanel, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            } catch (Exception e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+            }
+        });
+        clear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                for(JTextField text : texts){
+                    text.setText("");
+                }
+                descriptArea.setText("");
+            }
+        });
+        inputPanel.revalidate();
+        inputPanel.repaint();
+    }
+
+
     @Override
     public void actionPerformed(ActionEvent e){
         JButton source = (JButton) e.getSource();
@@ -468,7 +558,7 @@ public class ButtonHandler implements ActionListener{
                 case "Role":
                     switch (action) {
                     case "Create Role":
-                        JOptionPane.showMessageDialog(panel, "Create Role Clicked");
+                        RcreateFields();
                         break;
                     case "Search Role":
                         JOptionPane.showMessageDialog(panel, "Search Role Clicked");
