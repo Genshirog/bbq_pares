@@ -118,6 +118,22 @@ public class Employee extends JPanel implements Refreshable{
             e.printStackTrace();
         }
     }
+
+    @Override
+    public void updateTable(ResultSet rs) throws Exception{
+        tableModel.setRowCount(0); // Clear existing data
+
+        while (rs.next()) {
+            Object[] row = {
+                rs.getString("EmployeeID"),
+                rs.getString("EmployeeName"),
+                rs.getString("Role"),
+                rs.getString("Email"),
+                rs.getString("Phone_Number")
+            };
+            tableModel.addRow(row);
+        }
+    }
     
     //EmployeeID, first_name, last_name, email, phone_number, job_roleID
 }

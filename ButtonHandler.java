@@ -15,7 +15,6 @@ public class ButtonHandler implements ActionListener{
     private JPanel panel;
     private String name;
     private JPanel inputPanel;
-    private String Searchinput;
     public ButtonHandler(JPanel panel, String name, JPanel inputPanel){
         this.panel = panel;
         this.name = name;
@@ -107,50 +106,106 @@ public class ButtonHandler implements ActionListener{
         inputPanel.repaint();
         }
 
-    private void EsearchFields() {
-        inputPanel.removeAll();
-        inputPanel.setLayout(new GridBagLayout()); 
-        JPanel searchWrapper = new JPanel();
-        searchWrapper.setLayout(new BoxLayout(searchWrapper, BoxLayout.Y_AXIS));
-        searchWrapper.add(addPadding(EsearchHeader()));
-        searchWrapper.add(addPadding(Esearchinputs()));
-        searchWrapper.add(addPadding(Esearchbtn()));
-
-        inputPanel.add(searchWrapper);
-        inputPanel.revalidate();
-        inputPanel.repaint();
+        private void EsearchFields() {
+            inputPanel.removeAll();
+            inputPanel.setLayout(new GridBagLayout());
+        
+            JPanel searchWrapper = new JPanel();
+            searchWrapper.setLayout(new BoxLayout(searchWrapper, BoxLayout.Y_AXIS));
+        
+            JComboBox<String> employeeDropDown = new JComboBox<>(new String[]{"Employee_ID", "Employee_Name", "Role"});
+            JTextField input = new JTextField(15);
+        
+            searchWrapper.add(addPadding(EsearchHeader(employeeDropDown)));
+            searchWrapper.add(addPadding(Esearchinputs(input)));
+            searchWrapper.add(addPadding(Esearchbtn(employeeDropDown, input)));
+        
+            inputPanel.add(searchWrapper);
+            inputPanel.revalidate();
+            inputPanel.repaint();
         }
-    private JPanel EsearchHeader(){
-        JPanel searchBox = new JPanel();
-        searchBox.setBackground(Color.yellow);
-        String[] searchable = {"Employee_ID", "Employee_Name", "Role"};
-        JLabel label = new JLabel("Search By: ");
-        JComboBox<String> employeeDropDown = new JComboBox<>(searchable);
-        employeeDropDown.setPreferredSize(new Dimension(200,50));
-        searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
-        searchBox.add(label);
-        searchBox.add(employeeDropDown);
-        return searchBox;
-    }
-    private JPanel Esearchinputs(){
-        JPanel searchBox = new JPanel();
-        searchBox.setBackground(Color.blue);
-        JLabel searchLabel = new JLabel("Search "+this.name+": ");   
-        JTextField input = new JTextField(15);
-        setInput(input.getText());
-        searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
-        searchBox.add(searchLabel);
-        searchBox.add(input);
-        return searchBox;
-    }
-    private JPanel Esearchbtn(){
-        JPanel searchBox = new JPanel();
-        searchBox.setBackground(Color.green);
-        JButton search = new JButton("Search");
-        searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
-        searchBox.add(search);
-        return searchBox;
-    }
+        
+        private JPanel EsearchHeader(JComboBox<String> employeeDropDown) {
+            JPanel searchBox = new JPanel();
+            searchBox.setBackground(Color.yellow);
+            JLabel label = new JLabel("Search By: ");
+            employeeDropDown.setPreferredSize(new Dimension(200, 50));
+        
+            searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
+            searchBox.add(label);
+            searchBox.add(employeeDropDown);
+            return searchBox;
+        }
+        
+        private JPanel Esearchinputs(JTextField input) {
+            JPanel searchBox = new JPanel();
+            searchBox.setBackground(Color.blue);
+            JLabel searchLabel = new JLabel("Search: ");
+        
+            searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
+            searchBox.add(searchLabel);
+            searchBox.add(input);
+            return searchBox;
+        }
+        private JPanel Esearchbtn(JComboBox<String> employee, JTextField input){
+            JPanel searchBox = new JPanel();
+            searchBox.setBackground(Color.green);
+            JButton search = new JButton("Search");
+            search.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e){
+                    String searchCriteria = (String)employee.getSelectedItem();
+                    String searchText = input.getText();
+                    try {
+                        Connection conn = Database.getConnection();
+                        String sql = "";
+                        PreparedStatement stmt = null;
+                        switch (searchCriteria) {
+                            case "Employee_ID":
+                                sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE employeeID LIKE ? ORDER BY employeeID ASC";
+                                stmt = conn.prepareStatement(sql);
+                                stmt.setString(1, "%"+searchText+"%");
+                                break;
+                            case "Employee_Name":
+                                sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE employeeName LIKE ?";
+                                stmt = conn.prepareStatement(sql);
+                                stmt.setString(1, searchText+"%");
+                                break;
+                            case "Role":
+                                sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE role LIKE ?";
+                                stmt = conn.prepareStatement(sql);
+                                stmt.setString(1, searchText+"%");
+                                break;
+                            default:
+                                break;
+                        }
+                        ResultSet rs = stmt.executeQuery();
+                        if (refreshable != null) {
+                            refreshable.updateTable(rs);
+                        }
+                        conn.close();
+                        input.setText("");
+                    } catch (Exception x) {
+                        // TODO: handle exception
+                    }
+                }
+            });
+            JButton reset = new JButton("Reset");
+            reset.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e){
+                    try {
+                        refreshable.refreshTable();
+                    } catch (Exception x) {
+                        // TODO: handle exception
+                    }
+                }
+            });
+            searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
+            searchBox.add(search);
+            searchBox.add(reset);
+            return searchBox;
+        }
 
     private JPanel addPadding(JPanel panel) {
     JPanel paddedPanel = new JPanel(new BorderLayout());
@@ -158,12 +213,6 @@ public class ButtonHandler implements ActionListener{
     paddedPanel.add(panel, BorderLayout.CENTER);
     return paddedPanel;
 }
-    private void setInput(String input){
-        this.Searchinput = input;
-    }
-    private String getInput(){
-        return this.Searchinput;
-    }
 
     @Override
     public void actionPerformed(ActionEvent e){
