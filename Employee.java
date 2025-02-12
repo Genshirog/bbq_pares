@@ -21,7 +21,6 @@ public class Employee extends JPanel implements Refreshable{
         int centerY = (int) ((screenHeight - panelHeight) / 2);
 
         this.setBounds(centerX, centerY, panelWidth, panelHeight + 100);
-        this.setBackground(Color.PINK);
         this.setLayout(null);
         this.add(inputPanels(panelWidth, panelHeight));
         this.add(tablePanel(panelWidth, panelHeight));
@@ -41,7 +40,6 @@ public class Employee extends JPanel implements Refreshable{
         JPanel navbar = new JPanel();
         navbar.setBounds(0, panelHeight + 20, panelWidth, 100);
         navbar.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        navbar.setBackground(Color.pink);
         Buttons button = new Buttons("Employee");
         ButtonHandler handler = new ButtonHandler(this, "Employee", this.inputPanel);
         JButton createbtn = button.createBtn();
@@ -64,7 +62,6 @@ public class Employee extends JPanel implements Refreshable{
     public JPanel inputPanels(int panelWidth, int panelHeight){
         inputPanel = new JPanel();
         inputPanel.setBounds(0, 0, (int)(panelWidth * 0.30), panelHeight+20);
-        inputPanel.setBackground(Color.red);
         return inputPanel;
     }
 
