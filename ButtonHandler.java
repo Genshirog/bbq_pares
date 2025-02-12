@@ -11,7 +11,11 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class ButtonHandler implements ActionListener{
+<<<<<<< HEAD
     private Employee employee;
+=======
+    private Refreshable refreshable;
+>>>>>>> Genshirog
     private JPanel panel;
     private String name;
     private JPanel inputPanel;
@@ -20,6 +24,14 @@ public class ButtonHandler implements ActionListener{
         this.panel = panel;
         this.name = name;
         this.inputPanel = inputPanel;
+<<<<<<< HEAD
+=======
+        if(panel instanceof Refreshable){
+            this.refreshable = (Refreshable) panel;
+        }else{
+            this.refreshable = null;
+        }
+>>>>>>> Genshirog
     }
 
     private void EcreateFields() {
@@ -46,6 +58,7 @@ public class ButtonHandler implements ActionListener{
         }
         inputPanel.add(save);
         inputPanel.add(clear);
+<<<<<<< HEAD
         try {
             Connection conn = Database.getConnection();
             String sql = "INSERT INTO employee(first_name,last_name,JobRoleID,phone_number,email) VALUES(?,?,?,?,?)";
@@ -63,6 +76,60 @@ public class ButtonHandler implements ActionListener{
         }
         
 
+=======
+        save.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                try {
+                    Connection conn = Database.getConnection();
+
+                    String getLastID = "SELECT EmployeeID FROM employee ORDER BY EmployeeID DESC LIMIT 1";
+                    PreparedStatement getLastStmt = conn.prepareStatement(getLastID);
+                    ResultSet rs = getLastStmt.executeQuery();
+
+                    String newEmployeeID = "E001"; // Default for first employee
+                    if (rs.next()) {
+                        String lastID = rs.getString("EmployeeID"); // Example: "E005"
+                        int lastNum = Integer.parseInt(lastID.substring(1)); // Extract number (5)
+                        newEmployeeID = String.format("E%03d", lastNum + 1); // Increment and format ("E006")
+                    }
+                    rs.close();
+                    getLastStmt.close();
+                    String sql = "INSERT INTO employee(EmployeeID,first_name,last_name,JobRoleID,phone_number,email) VALUES(?,?,?,?,?,?)";
+                    PreparedStatement stmt = conn.prepareStatement(sql);
+                    stmt.setString(1, newEmployeeID);
+                    stmt.setString(2, ftext.getText());
+                    stmt.setString(3, ltext.getText());
+                    stmt.setString(4, rtext.getText());
+                    stmt.setString(5, ptext.getText());
+                    stmt.setString(6, etext.getText());
+                    stmt.executeUpdate();
+                    for(JTextField text : texts){
+                        text.setText("");
+                    }
+                stmt.close();
+                conn.close();
+                if (refreshable != null) {
+                    refreshable.refreshTable();  // Add this!
+                }
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(inputPanel, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                ex.printStackTrace();
+            } catch (Exception e1) {
+                            // TODO Auto-generated catch block
+                            e1.printStackTrace();
+                        }
+            }
+        });
+        clear.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e){
+                for(JTextField text : texts){
+                    text.setText("");
+                }
+            }
+        });
+>>>>>>> Genshirog
         inputPanel.revalidate();
         inputPanel.repaint();
         }
@@ -124,7 +191,11 @@ public class ButtonHandler implements ActionListener{
     private String getInput(){
         return this.Searchinput;
     }
+<<<<<<< HEAD
     
+=======
+
+>>>>>>> Genshirog
     @Override
     public void actionPerformed(ActionEvent e){
         JButton source = (JButton) e.getSource();
@@ -133,6 +204,7 @@ public class ButtonHandler implements ActionListener{
             case "Employee":
                 switch (action) {
                     case "Create Employee":
+<<<<<<< HEAD
                         try {
                             EcreateFields();
                             employee.refreshTable();
@@ -140,6 +212,10 @@ public class ButtonHandler implements ActionListener{
                         } catch (Exception x) {
                             // TODO: handle exception
                         }
+=======
+                            EcreateFields();
+                        break;
+>>>>>>> Genshirog
                     case "Search Employee":
                         EsearchFields();
                         break;
@@ -191,6 +267,10 @@ public class ButtonHandler implements ActionListener{
                         JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                         break;
                 }
+<<<<<<< HEAD
+=======
+                break;
+>>>>>>> Genshirog
                 case "Role":
                     switch (action) {
                     case "Create Role":
@@ -209,6 +289,10 @@ public class ButtonHandler implements ActionListener{
                         JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                         break;
                 }
+<<<<<<< HEAD
+=======
+                break;
+>>>>>>> Genshirog
                 case "Menu":
                     switch (action) {
                     case "Create Menu":

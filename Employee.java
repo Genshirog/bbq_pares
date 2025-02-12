@@ -9,7 +9,11 @@ import java.sql.SQLException;
 import javax.swing.*;
 import javax.swing.table.*;
 
+<<<<<<< HEAD
 public class Employee extends JPanel{
+=======
+public class Employee extends JPanel implements Refreshable{
+>>>>>>> Genshirog
     JPanel inputPanel;
     private JTable table;
     private DefaultTableModel tableModel;
@@ -25,7 +29,20 @@ public class Employee extends JPanel{
         this.setLayout(null);
         this.add(inputPanels(panelWidth, panelHeight));
         this.add(tablePanel(panelWidth, panelHeight));
+<<<<<<< HEAD
         this.add(navbar(panelWidth, panelHeight));
+=======
+        this.add(navbar(panelWidth, panelHeight));  
+
+        try {
+            refreshTable();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error loading table data: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+>>>>>>> Genshirog
     }
 
     private JPanel navbar(int panelWidth, int panelHeight){
@@ -66,13 +83,32 @@ public class Employee extends JPanel{
         tablePanel.setLayout(new BorderLayout());
 
         String[] col = {"EmployeeID", "Employee Name", "Role", "Email", "Phone Number"};
+<<<<<<< HEAD
         table = new JTable(new DefaultTableModel(new Object[][] {}, col));
         JScrollPane scroll = new JScrollPane(table);
 
+=======
+        tableModel = new DefaultTableModel(col,0){
+            @Override
+            public boolean isCellEditable(int row, int col){
+                return false;
+            }
+        };
+        table = new JTable(tableModel);
+        table.setFillsViewportHeight(true);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.getTableHeader().setReorderingAllowed(false);
+        JScrollPane scroll = new JScrollPane(table);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+>>>>>>> Genshirog
         tablePanel.add(scroll, BorderLayout.CENTER);
         return tablePanel;
     }
     
+<<<<<<< HEAD
+=======
+    @Override
+>>>>>>> Genshirog
     public void refreshTable() throws Exception {
         tableModel.setRowCount(0); // Clear existing table data
         try {
@@ -83,11 +119,19 @@ public class Employee extends JPanel{
 
             while (rs.next()) {
                 Object[] row = {
+<<<<<<< HEAD
                     rs.getInt("EmployeeID"),
                     rs.getString("Employee Name"),
                     rs.getInt("Role"),
                     rs.getString("Email"),
                     rs.getString("Phone Number")
+=======
+                    rs.getString("EmployeeID"),
+                    rs.getString("EmployeeName"),
+                    rs.getString("Role"),
+                    rs.getString("Email"),
+                    rs.getString("Phone_Number")
+>>>>>>> Genshirog
                 };
                 tableModel.addRow(row);
             }
