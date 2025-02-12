@@ -11,11 +11,7 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 public class ButtonHandler implements ActionListener{
-<<<<<<< HEAD
-    private Employee employee;
-=======
     private Refreshable refreshable;
->>>>>>> Genshirog
     private JPanel panel;
     private String name;
     private JPanel inputPanel;
@@ -24,14 +20,11 @@ public class ButtonHandler implements ActionListener{
         this.panel = panel;
         this.name = name;
         this.inputPanel = inputPanel;
-<<<<<<< HEAD
-=======
         if(panel instanceof Refreshable){
             this.refreshable = (Refreshable) panel;
         }else{
             this.refreshable = null;
         }
->>>>>>> Genshirog
     }
 
     private void EcreateFields() {
@@ -58,25 +51,6 @@ public class ButtonHandler implements ActionListener{
         }
         inputPanel.add(save);
         inputPanel.add(clear);
-<<<<<<< HEAD
-        try {
-            Connection conn = Database.getConnection();
-            String sql = "INSERT INTO employee(first_name,last_name,JobRoleID,phone_number,email) VALUES(?,?,?,?,?)";
-            PreparedStatement stmt = conn.prepareStatement(sql);
-            stmt.setString(1, ftext.getText());
-            stmt.setString(2, ltext.getText());
-            stmt.setString(3, rtext.getText());
-            stmt.setString(4, ptext.getText());
-            stmt.setString(5, etext.getText());
-            stmt.executeUpdate();
-            conn.close();
-
-        } catch (Exception e) {
-            // TODO: handle exception
-        }
-        
-
-=======
         save.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
@@ -129,7 +103,6 @@ public class ButtonHandler implements ActionListener{
                 }
             }
         });
->>>>>>> Genshirog
         inputPanel.revalidate();
         inputPanel.repaint();
         }
@@ -191,11 +164,6 @@ public class ButtonHandler implements ActionListener{
     private String getInput(){
         return this.Searchinput;
     }
-<<<<<<< HEAD
-    
-=======
-
->>>>>>> Genshirog
     @Override
     public void actionPerformed(ActionEvent e){
         JButton source = (JButton) e.getSource();
@@ -204,20 +172,10 @@ public class ButtonHandler implements ActionListener{
             case "Employee":
                 switch (action) {
                     case "Create Employee":
-<<<<<<< HEAD
-                        try {
-                            EcreateFields();
-                            employee.refreshTable();
-                            break;
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-=======
                             EcreateFields();
                         break;
->>>>>>> Genshirog
                     case "Search Employee":
-                        EsearchFields();
+                            EsearchFields();
                         break;
                     case "Update Employee":
                         JOptionPane.showMessageDialog(panel, "Update Employee Clicked");
@@ -267,10 +225,7 @@ public class ButtonHandler implements ActionListener{
                         JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                         break;
                 }
-<<<<<<< HEAD
-=======
                 break;
->>>>>>> Genshirog
                 case "Role":
                     switch (action) {
                     case "Create Role":
@@ -289,10 +244,7 @@ public class ButtonHandler implements ActionListener{
                         JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                         break;
                 }
-<<<<<<< HEAD
-=======
                 break;
->>>>>>> Genshirog
                 case "Menu":
                     switch (action) {
                     case "Create Menu":
