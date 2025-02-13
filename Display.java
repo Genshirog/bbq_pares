@@ -12,7 +12,7 @@ public class Display extends JFrame implements ActionListener{
 
 
     //Welcome to inventorySystem version 3
-    //Type the hours you put on this before crying: 9hrs
+    //Type the hours you put on this before crying: 11hrs
 
     Display(){
         screenSize();
