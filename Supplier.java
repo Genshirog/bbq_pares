@@ -24,7 +24,7 @@ public class Supplier extends JPanel{
         navbar.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         navbar.setBackground(Color.YELLOW);
         Buttons button = new Buttons("Supplier");
-        ButtonHandler handler = new ButtonHandler(this, "Supplier", inputPanel);
+        ButtonHandler handler = new ButtonHandler(this, "Supplier");
         JButton createbtn = button.createBtn();
         JButton searchbtn = button.searchBtn();
         JButton updatebtn = button.updateBtn();

@@ -42,7 +42,7 @@ public class Role extends JPanel implements Refreshable{
         navbar.setBounds(0, panelHeight + 20, panelWidth, 100);
         navbar.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         Buttons button = new Buttons("Role");
-        ButtonHandler handler = new ButtonHandler(this, "Role", inputPanel);
+        ButtonHandler handler = new ButtonHandler(this, "Role");
         JButton createbtn = button.createBtn();
         JButton searchbtn = button.searchBtn();
         JButton updatebtn = button.updateBtn();
