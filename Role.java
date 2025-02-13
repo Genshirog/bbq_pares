@@ -21,11 +21,19 @@ public class Role extends JPanel implements Refreshable{
         int centerY = (int) ((screenHeight - panelHeight) / 2);
 
         this.setBounds(centerX, centerY, panelWidth, panelHeight + 100);
-        this.setBackground(Color.GREEN);
         this.setLayout(null);
         this.add(inputPanel(panelWidth, panelHeight));
         this.add(navbar(panelWidth, panelHeight));
         this.add(tablePanel(panelWidth, panelHeight));
+
+        try {
+            refreshTable();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error loading table data: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
 
     }
 
@@ -33,7 +41,6 @@ public class Role extends JPanel implements Refreshable{
         JPanel navbar = new JPanel();
         navbar.setBounds(0, panelHeight + 20, panelWidth, 100);
         navbar.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        navbar.setBackground(Color.GREEN);
         Buttons button = new Buttons("Role");
         ButtonHandler handler = new ButtonHandler(this, "Role", inputPanel);
         JButton createbtn = button.createBtn();
@@ -56,7 +63,6 @@ public class Role extends JPanel implements Refreshable{
     private JPanel inputPanel(int panelWidth, int panelHeight){
         inputPanel = new JPanel();
         inputPanel.setBounds(0, 0, (int)(panelWidth * 0.30), panelHeight+20);
-        inputPanel.setBackground(Color.red);
         inputPanel.setLayout(null);
         return inputPanel;
     }
@@ -89,7 +95,7 @@ public class Role extends JPanel implements Refreshable{
         tableModel.setRowCount(0); // Clear existing table data
         try {
             Connection conn = Database.getConnection();
-            String sql = "SELECT * FROM job_role";
+            String sql = "SELECT * FROM job_view";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
@@ -117,11 +123,10 @@ public class Role extends JPanel implements Refreshable{
 
         while (rs.next()) {
             Object[] row = {
-                rs.getString("EmployeeID"),
-                rs.getString("EmployeeName"),
-                rs.getString("Role"),
-                rs.getString("Email"),
-                rs.getString("Phone_Number")
+                rs.getString("JobRoleID"),
+                rs.getString("role_name"),
+                rs.getString("role_description"),
+                rs.getString("role_shift")
             };
             tableModel.addRow(row);
         }
@@ -183,7 +188,7 @@ public class Role extends JPanel implements Refreshable{
                     stmt.setString(1, newJobRoleID);
                     stmt.setString(2, rtext.getText());
                     stmt.setString(3, descriptArea.getText());
-                    stmt.setString(4, shift.getText());
+                    stmt.setString(4, stext.getText());
                     stmt.executeUpdate();
                     for(JTextField text : texts){
                         text.setText("");
@@ -191,6 +196,7 @@ public class Role extends JPanel implements Refreshable{
                     descriptArea.setText("");
                 stmt.close();
                 conn.close();
+                refreshTable();
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(inputPanel, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
@@ -267,17 +273,17 @@ public class Role extends JPanel implements Refreshable{
                     PreparedStatement stmt = null;
                     switch (searchCriteria) {
                         case "RoleID":
-                            sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE employeeID LIKE ? ORDER BY employeeID ASC";
+                            sql = "SELECT JobRoleID,role_name,role_description,role_shift FROM job_view WHERE JobRoleID LIKE ? ORDER BY JobRoleID ASC";
                             stmt = conn.prepareStatement(sql);
                             stmt.setString(1, "%"+searchText+"%");
                             break;
                         case "Role":
-                            sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE employeeName LIKE ?";
+                            sql = "SELECT JobRoleID,role_name,role_description,role_shift FROM job_view WHERE role_name LIKE ?";
                             stmt = conn.prepareStatement(sql);
                             stmt.setString(1, searchText+"%");
                             break;
                         case "Shift":
-                            sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE role LIKE ?";
+                            sql = "SELECT JobRoleID,role_name,role_description,role_shift FROM job_view WHERE role_shift LIKE ?";
                             stmt = conn.prepareStatement(sql);
                             stmt.setString(1, searchText+"%");
                             break;
@@ -346,13 +352,13 @@ public class Role extends JPanel implements Refreshable{
             public void actionPerformed(ActionEvent e){
                 try {
                     Connection conn = Database.getConnection();
-                    String sql = "SELECT employeeID FROM employee_view WHERE employeeID = ?";
+                    String sql = "SELECT JobRoleID FROM job_role WHERE JobRoleID = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
                     stmt.setString(1, text.getText());
                     ResultSet rs = stmt.executeQuery();
 
                     while(rs.next()){
-                        String id = rs.getString("employeeID");
+                        String id = rs.getString("JobRoleID");
                         if(id.equals(text.getText())){
                             EupdateRecord(text.getText());
                             break;
@@ -418,25 +424,12 @@ public class Role extends JPanel implements Refreshable{
             public void actionPerformed(ActionEvent e){
                 try {
                     Connection conn = Database.getConnection();
-
-                    String getLastID = "SELECT JobRoleID FROM job_role ORDER BY JobRoleID DESC LIMIT 1";
-                    PreparedStatement getLastStmt = conn.prepareStatement(getLastID);
-                    ResultSet rs = getLastStmt.executeQuery();
-
-                    String newJobRoleID = "R001";
-                    if (rs.next()) {
-                        String lastID = rs.getString("JobRoleID");
-                        int lastNum = Integer.parseInt(lastID.substring(1));
-                        newJobRoleID = String.format("R%03d", lastNum + 1);
-                    }
-                    rs.close();
-                    getLastStmt.close();
-                    String sql = "INSERT INTO job_role(JobRoleID,role_name,role_description,role_shift) VALUES (?,?,?,?)";
+                    String sql = "UPDATE job_role SET role_name = ?, role_description = ?, role_shift = ? WHERE JobRoleID = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, newJobRoleID);
-                    stmt.setString(2, rtext.getText());
-                    stmt.setString(3, descriptArea.getText());
-                    stmt.setString(4, shift.getText());
+                    stmt.setString(1, rtext.getText());
+                    stmt.setString(2, descriptArea.getText());
+                    stmt.setString(3, stext.getText());
+                    stmt.setString(4, input);
                     stmt.executeUpdate();
                     for(JTextField text : texts){
                         text.setText("");
@@ -444,6 +437,7 @@ public class Role extends JPanel implements Refreshable{
                     descriptArea.setText("");
                 stmt.close();
                 conn.close();
+                refreshTable();
             } catch (SQLException ex) {
                 JOptionPane.showMessageDialog(inputPanel, "Database Error: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                 ex.printStackTrace();
@@ -495,7 +489,7 @@ public class Role extends JPanel implements Refreshable{
             public void actionPerformed(ActionEvent e){
                 try {
                     Connection conn = Database.getConnection();
-                    String sql = "DELETE FROM role WHERE roleID = ?";
+                    String sql = "DELETE FROM job_role WHERE JobRoleID = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
                     stmt.setString(1, text.getText());
                     stmt.executeUpdate();
