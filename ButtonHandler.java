@@ -118,13 +118,25 @@ public class ButtonHandler implements ActionListener{
                         }
                         break;
                     case "Search Role":
-                        JOptionPane.showMessageDialog(panel, "Search Role Clicked");
+                        try {
+                            refreshable.searchFields();
+                        } catch (Exception x) {
+                            // TODO: handle exception
+                        }
                         break;
                     case "Update Role":
-                        JOptionPane.showMessageDialog(panel, "Update Role Clicked");
+                        try {
+                            refreshable.updateFields();
+                        } catch (Exception x) {
+                            // TODO: handle exception
+                        }
                         break;
                     case "Delete Role":
-                        JOptionPane.showMessageDialog(panel, "Delete Role Clicked");
+                        try {
+                            refreshable.deleteFields();
+                        } catch (Exception x) {
+                            // TODO: handle exception
+                        }
                         break;
                     default:
                         JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
