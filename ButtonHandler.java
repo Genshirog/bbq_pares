@@ -10,11 +10,9 @@ public class ButtonHandler implements ActionListener{
     private Refreshable refreshable;
     private JPanel panel;
     private String name;
-    private JPanel inputPanel;
-    public ButtonHandler(JPanel panel, String name, JPanel inputPanel){
+    public ButtonHandler(JPanel panel, String name){
         this.panel = panel;
         this.name = name;
-        this.inputPanel = inputPanel;
         if(panel instanceof Refreshable){
             this.refreshable = (Refreshable) panel;
         }else{
@@ -33,7 +31,33 @@ public class ButtonHandler implements ActionListener{
         String action = source.getText();
         switch (this.name) {
             case "Employee":
+                try {
+                    switch (action) {
+                        case "Create Employee":
+                                refreshable.createFields();
+                                refreshable.refreshTable();
+                            break;
+                        case "Search Employee":
+                                refreshable.searchFields();
+                        case "Update Employee":
+                                refreshable.updateFields();
+                            
+                            break;
+                        case "Delete Employee":
+                                refreshable.deleteFields();
+                            break;
+                        default:
+                            JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
+                            break;
+                    }
+                } catch (Exception x) {
+                    // TODO: handle exception
+                }
+                
+                break;
+            case "Supplier":
                 switch (action) {
+<<<<<<< HEAD
                     case "Create Employee":
                         try {
                             refreshable.createFields();
@@ -70,23 +94,68 @@ public class ButtonHandler implements ActionListener{
                 }
                 break;
                 case "Supplier":
+=======
+                case "Create Supplier":
+                    JOptionPane.showMessageDialog(panel, "Create Supplier Clicked");
+                    break;
+                case "Search Supplier":
+                    JOptionPane.showMessageDialog(panel, "Search Supplier Clicked");
+                    break;
+                case "Update Supplier":
+                    JOptionPane.showMessageDialog(panel, "Update Supplier Clicked");
+                    break;
+                case "Delete Supplier":
+                    JOptionPane.showMessageDialog(panel, "Delete Supplier Clicked");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
+                    break;
+            }
+            break;
+            case "Customer":
+                switch (action) {
+                case "Create Customer":
+                    JOptionPane.showMessageDialog(panel, "Create Customer Clicked");
+                    break;
+                case "Search Customer":
+                    JOptionPane.showMessageDialog(panel, "Search Customer Clicked");
+                    break;
+                case "Update Customer":
+                    JOptionPane.showMessageDialog(panel, "Update Customer Clicked");
+                    break;
+                case "Delete Customer":
+                    JOptionPane.showMessageDialog(panel, "Delete Customer Clicked");
+                    break;
+                default:
+                    JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
+                    break;
+            }
+            break;
+            case "Role":
+                try {
+>>>>>>> Genshirog
                     switch (action) {
-                    case "Create Supplier":
-                        JOptionPane.showMessageDialog(panel, "Create Supplier Clicked");
-                        break;
-                    case "Search Supplier":
-                        JOptionPane.showMessageDialog(panel, "Search Supplier Clicked");
-                        break;
-                    case "Update Supplier":
-                        JOptionPane.showMessageDialog(panel, "Update Supplier Clicked");
-                        break;
-                    case "Delete Supplier":
-                        JOptionPane.showMessageDialog(panel, "Delete Supplier Clicked");
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
-                        break;
+                        case "Create Role":
+                            refreshable.createFields();
+                            refreshable.refreshTable();
+                            break;
+                        case "Search Role":
+                            refreshable.searchFields();
+                            break;
+                        case "Update Role":
+                            refreshable.updateFields();
+                            break;
+                        case "Delete Role":
+                            refreshable.deleteFields();
+                            break;
+                        default:
+                            JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
+                            break;
+                    }
+                } catch (Exception x) {
+                    // TODO: handle exception
                 }
+<<<<<<< HEAD
                 break;
                 case "Customer":
                     switch (action) {
@@ -145,24 +214,36 @@ public class ButtonHandler implements ActionListener{
                 break;
                 case "Menu":
                     switch (action) {
+=======
+                
+            break;
+            case "Menu":
+            try {
+                switch (action) {
+>>>>>>> Genshirog
                     case "Create Menu":
-                        JOptionPane.showMessageDialog(panel, "Create Menu Clicked");
+                        refreshable.createFields();
+                        refreshable.refreshTable();
                         break;
                     case "Search Menu":
-                        JOptionPane.showMessageDialog(panel, "Search Menu Clicked");
+                        refreshable.searchFields();
                         break;
                     case "Update Menu":
-                        JOptionPane.showMessageDialog(panel, "Update Menu Clicked");
+                        refreshable.updateFields();
                         break;
                     case "Delete Menu":
-                        JOptionPane.showMessageDialog(panel, "Delete Menu Clicked");
+                        refreshable.deleteFields();
                         break;
                     default:
                         JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                         break;
+                
+                    }
+                } catch (Exception x) {
+                    // TODO: handle exception
                 }
-            default:
-                break;
+        default:
+            break;
         }
         
     }

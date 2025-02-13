@@ -39,7 +39,7 @@ public class Employee extends JPanel implements Refreshable{
         navbar.setBounds(0, panelHeight + 20, panelWidth, 100);
         navbar.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
         Buttons button = new Buttons("Employee");
-        ButtonHandler handler = new ButtonHandler(this, "Employee", this.inputPanel);
+        ButtonHandler handler = new ButtonHandler(this, "Employee");
         JButton createbtn = button.createBtn();
         JButton searchbtn = button.searchBtn();
         JButton updatebtn = button.updateBtn();

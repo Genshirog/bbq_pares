@@ -82,7 +82,7 @@ public class Display extends JFrame implements ActionListener{
         int titleBoxWidth = (int)getScreenWidth();
         JPanel titleBox = new JPanel();
         titleBox.setBounds(0,0,titleBoxWidth, titleBoxHeight);
-        titleBox.setBackground(getBackground().RED);
+        titleBox.setBackground(Color.RED);
         titleBox.add(titleContent());
         titleBox.setLayout(null);
         return titleBox;
@@ -96,7 +96,7 @@ public class Display extends JFrame implements ActionListener{
         
         JPanel titleContent = new JPanel();
         titleContent.setBounds((int)(getScreenWidth() * 0.25),0,titleContentWidth,titleContentHeight);
-        titleContent.setBackground(getBackground().blue);
+        titleContent.setBackground(Color.blue);
         
         titleContent.add(title(titleContentWidth,titleContentHeight));
         titleContent.setLayout(null);
