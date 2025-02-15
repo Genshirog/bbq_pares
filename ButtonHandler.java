@@ -57,44 +57,6 @@ public class ButtonHandler implements ActionListener{
                 break;
             case "Supplier":
                 switch (action) {
-<<<<<<< HEAD
-                    case "Create Employee":
-                        try {
-                            refreshable.createFields();
-                            refreshable.refreshTable();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    case "Search Employee":
-                        try {
-                            refreshable.searchFields();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    case "Update Employee":
-                        try {
-                            refreshable.updateFields();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        
-                        break;
-                    case "Delete Employee":
-                        try {
-                            refreshable.deleteFields();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
-                        break;
-                }
-                break;
-                case "Supplier":
-=======
                 case "Create Supplier":
                     JOptionPane.showMessageDialog(panel, "Create Supplier Clicked");
                     break;
@@ -133,7 +95,6 @@ public class ButtonHandler implements ActionListener{
             break;
             case "Role":
                 try {
->>>>>>> Genshirog
                     switch (action) {
                         case "Create Role":
                             refreshable.createFields();
@@ -155,72 +116,11 @@ public class ButtonHandler implements ActionListener{
                 } catch (Exception x) {
                     // TODO: handle exception
                 }
-<<<<<<< HEAD
-                break;
-                case "Customer":
-                    switch (action) {
-                    case "Create Customer":
-                        JOptionPane.showMessageDialog(panel, "Create Customer Clicked");
-                        break;
-                    case "Search Customer":
-                        JOptionPane.showMessageDialog(panel, "Search Customer Clicked");
-                        break;
-                    case "Update Customer":
-                        JOptionPane.showMessageDialog(panel, "Update Customer Clicked");
-                        break;
-                    case "Delete Customer":
-                        JOptionPane.showMessageDialog(panel, "Delete Customer Clicked");
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
-                        break;
-                }
-                break;
-                case "Role":
-                    switch (action) {
-                    case "Create Role":
-                        try {
-                            refreshable.createFields();
-                            refreshable.refreshTable();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    case "Search Role":
-                        try {
-                            refreshable.searchFields();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    case "Update Role":
-                        try {
-                            refreshable.updateFields();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    case "Delete Role":
-                        try {
-                            refreshable.deleteFields();
-                        } catch (Exception x) {
-                            // TODO: handle exception
-                        }
-                        break;
-                    default:
-                        JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
-                        break;
-                }
-                break;
-                case "Menu":
-                    switch (action) {
-=======
                 
             break;
             case "Menu":
             try {
                 switch (action) {
->>>>>>> Genshirog
                     case "Create Menu":
                         refreshable.createFields();
                         refreshable.refreshTable();
