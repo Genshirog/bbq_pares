@@ -56,22 +56,27 @@ public class ButtonHandler implements ActionListener{
                 
                 break;
             case "Supplier":
+            try{
                 switch (action) {
                 case "Create Supplier":
-                    JOptionPane.showMessageDialog(panel, "Create Supplier Clicked");
+                    refreshable.createFields();
+                    refreshable.refreshTable();
                     break;
                 case "Search Supplier":
-                    JOptionPane.showMessageDialog(panel, "Search Supplier Clicked");
+                    refreshable.searchFields();
                     break;
                 case "Update Supplier":
-                    JOptionPane.showMessageDialog(panel, "Update Supplier Clicked");
+                    refreshable.updateFields();
                     break;
                 case "Delete Supplier":
-                    JOptionPane.showMessageDialog(panel, "Delete Supplier Clicked");
+                    refreshable.deleteFields();
                     break;
                 default:
                     JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                     break;
+            }
+            }catch(Exception x){
+
             }
             break;
             case "Customer":
