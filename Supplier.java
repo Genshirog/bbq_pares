@@ -59,6 +59,11 @@ public class Supplier extends JPanel implements Refreshable{
         inputPanel = new JPanel();
         inputPanel.setBounds(0, 0, (int)(panelWidth * 0.30), panelHeight+20);
         inputPanel.setLayout(null);
+        try {
+            createFields();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         return inputPanel;
     }
 
