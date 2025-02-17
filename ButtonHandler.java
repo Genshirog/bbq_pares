@@ -39,7 +39,6 @@ public class ButtonHandler implements ActionListener{
                             break;
                         case "Search Employee":
                                 refreshable.searchFields();
-                            break;
                         case "Update Employee":
                                 refreshable.updateFields();
                             
@@ -76,22 +75,27 @@ public class ButtonHandler implements ActionListener{
             }
             break;
             case "Customer":
+            try{
                 switch (action) {
                 case "Create Customer":
-                    JOptionPane.showMessageDialog(panel, "Create Customer Clicked");
+                    refreshable.createFields();
+                    refreshable.refreshTable();
                     break;
                 case "Search Customer":
-                    JOptionPane.showMessageDialog(panel, "Search Customer Clicked");
+                    refreshable.searchFields();
                     break;
                 case "Update Customer":
-                    JOptionPane.showMessageDialog(panel, "Update Customer Clicked");
+                    refreshable.updateFields();
                     break;
                 case "Delete Customer":
-                    JOptionPane.showMessageDialog(panel, "Delete Customer Clicked");
+                    refreshable.deleteFields();
                     break;
                 default:
                     JOptionPane.showMessageDialog(panel, "Unknown Action: " + action);
                     break;
+            }
+            }catch(Exception x){
+
             }
             break;
             case "Role":
@@ -123,7 +127,6 @@ public class ButtonHandler implements ActionListener{
             try {
                 switch (action) {
                     case "Create Menu":
-                        System.out.println("create was triggered");
                         refreshable.createFields();
                         refreshable.refreshTable();
                         break;
