@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Feb 17, 2025 at 03:21 PM
+-- Generation Time: Feb 17, 2025 at 04:29 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -31,9 +31,28 @@ CREATE TABLE `customer` (
   `first_name` varchar(60) NOT NULL,
   `last_name` varchar(60) NOT NULL,
   `middle_name` varchar(60) NOT NULL,
-  `special_case` varchar(20) NOT NULL,
-  `CustomerID` varchar(10) NOT NULL
+  `CustomerID` varchar(10) NOT NULL,
+  `service_type` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `customer`
+--
+
+INSERT INTO `customer` (`first_name`, `last_name`, `middle_name`, `CustomerID`, `service_type`) VALUES
+('test', 'test', 'test', 'C001', 'test');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `customer_view`
+-- (See below for the actual view)
+--
+CREATE TABLE `customer_view` (
+`CustomerID` varchar(10)
+,`Name` varchar(183)
+,`Service` varchar(60)
+);
 
 -- --------------------------------------------------------
 
@@ -232,13 +251,44 @@ CREATE TABLE `receipt` (
 
 CREATE TABLE `supplier` (
   `supplierID` varchar(10) NOT NULL,
-  `supplier_name` varchar(60) NOT NULL,
+  `first_name` varchar(60) NOT NULL,
+  `last_name` varchar(60) NOT NULL,
   `contact_person` varchar(60) NOT NULL,
   `phone_number` varchar(30) NOT NULL,
   `email` varchar(60) NOT NULL,
-  `address` varchar(60) NOT NULL,
-  `supplier_items` varchar(100) NOT NULL
+  `address` varchar(60) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `supplier`
+--
+
+INSERT INTO `supplier` (`supplierID`, `first_name`, `last_name`, `contact_person`, `phone_number`, `email`, `address`) VALUES
+('S001', 'test', 'test', 'test', 'test', 'test', 'test');
+
+-- --------------------------------------------------------
+
+--
+-- Stand-in structure for view `supplier_view`
+-- (See below for the actual view)
+--
+CREATE TABLE `supplier_view` (
+`supplierID` varchar(10)
+,`supplierName` varchar(122)
+,`contact_person` varchar(60)
+,`address` varchar(60)
+,`email` varchar(60)
+,`phone_number` varchar(30)
+);
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `customer_view`
+--
+DROP TABLE IF EXISTS `customer_view`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `customer_view`  AS SELECT `customer`.`CustomerID` AS `CustomerID`, concat(`customer`.`last_name`,', ',`customer`.`first_name`,' ',`customer`.`middle_name`) AS `Name`, `customer`.`service_type` AS `Service` FROM `customer` ;
 
 -- --------------------------------------------------------
 
@@ -257,6 +307,15 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 DROP TABLE IF EXISTS `job_view`;
 
 CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `job_view`  AS SELECT `j`.`JobRoleID` AS `JobRoleID`, `j`.`role_name` AS `role_name`, `j`.`role_description` AS `role_description`, `j`.`role_shift` AS `role_shift` FROM `job_role` AS `j` ;
+
+-- --------------------------------------------------------
+
+--
+-- Structure for view `supplier_view`
+--
+DROP TABLE IF EXISTS `supplier_view`;
+
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `supplier_view`  AS SELECT `supplier`.`supplierID` AS `supplierID`, concat(`supplier`.`last_name`,', ',`supplier`.`first_name`) AS `supplierName`, `supplier`.`contact_person` AS `contact_person`, `supplier`.`address` AS `address`, `supplier`.`email` AS `email`, `supplier`.`phone_number` AS `phone_number` FROM `supplier` ;
 
 --
 -- Indexes for dumped tables
