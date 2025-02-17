@@ -39,6 +39,7 @@ public class ButtonHandler implements ActionListener{
                             break;
                         case "Search Employee":
                                 refreshable.searchFields();
+                            break;
                         case "Update Employee":
                                 refreshable.updateFields();
                             
@@ -122,6 +123,7 @@ public class ButtonHandler implements ActionListener{
             try {
                 switch (action) {
                     case "Create Menu":
+                        System.out.println("create was triggered");
                         refreshable.createFields();
                         refreshable.refreshTable();
                         break;

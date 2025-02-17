@@ -60,6 +60,11 @@ public class Employee extends JPanel implements Refreshable{
     public JPanel inputPanels(int panelWidth, int panelHeight){
         inputPanel = new JPanel();
         inputPanel.setBounds(0, 0, (int)(panelWidth * 0.30), panelHeight+20);
+        try {
+            createFields();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         return inputPanel;
     }
 

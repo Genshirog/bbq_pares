@@ -12,4 +12,4 @@ important to display table before any functions
 
 Found solution for OrderItems, Order, Receipt
 currently thinking if receipt should be nulled.
-Are we gonna create a Product table
+Are we gonna create a Product table?

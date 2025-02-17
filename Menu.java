@@ -19,7 +19,6 @@ public class Menu extends JPanel implements Refreshable{
         int centerY = (int) ((screenHeight - panelHeight) / 2); 
 
         this.setBounds(centerX, centerY, panelWidth, panelHeight + 100);
-        this.setBackground(Color.GREEN);
         this.setLayout(null);
         this.add(inputPanel(panelWidth, panelHeight));
         this.add(tablePanel(panelWidth, panelHeight));
@@ -39,7 +38,6 @@ public class Menu extends JPanel implements Refreshable{
         JPanel navbar = new JPanel();
         navbar.setBounds(0, panelHeight + 20, panelWidth, 100);
         navbar.setLayout(new FlowLayout(FlowLayout.CENTER, 10, 10));
-        //navbar.setBackground(Color.GREEN);
         Buttons button = new Buttons("Menu");
         ButtonHandler handler = new ButtonHandler(this, "Menu");
         JButton createbtn = button.createBtn();
@@ -62,8 +60,12 @@ public class Menu extends JPanel implements Refreshable{
     private JPanel inputPanel(int panelWidth, int panelHeight){
         inputPanel = new JPanel();
         inputPanel.setBounds(0, 0, (int)(panelWidth * 0.30), panelHeight+20);
-        inputPanel.setBackground(Color.red);
         inputPanel.setLayout(null);
+        try {
+            createFields();
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
         return inputPanel;
     }
 
@@ -73,7 +75,7 @@ public class Menu extends JPanel implements Refreshable{
         tablePanel.setBackground(Color.WHITE);
         tablePanel.setLayout(new BorderLayout());
 
-        String[] col = {"EmployeeID", "Employee Name", "Role", "Email", "Phone Number"};
+        String[] col = {"OrderID", "Order Date", "Order Description(Dine-in/Take-out)"};
         tableModel = new DefaultTableModel(col,0){
             @Override
             public boolean isCellEditable(int row, int col){
@@ -95,17 +97,15 @@ public class Menu extends JPanel implements Refreshable{
         tableModel.setRowCount(0); // Clear existing table data
         try {
             Connection conn = Database.getConnection();
-            String sql = "SELECT * FROM employee_view";
+            String sql = "SELECT * FROM orders";
             PreparedStatement stmt = conn.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
             while (rs.next()) {
                 Object[] row = {
-                    rs.getString("EmployeeID"),
-                    rs.getString("EmployeeName"),
-                    rs.getString("Role"),
-                    rs.getString("Email"),
-                    rs.getString("Phone_Number")
+                    rs.getString("OrderID"),
+                    rs.getString("order_date"),
+                    rs.getString("order_description"),
                 };
                 tableModel.addRow(row);
             }
@@ -124,11 +124,9 @@ public class Menu extends JPanel implements Refreshable{
 
         while (rs.next()) {
             Object[] row = {
-                rs.getString("EmployeeID"),
-                rs.getString("EmployeeName"),
-                rs.getString("Role"),
-                rs.getString("Email"),
-                rs.getString("Phone_Number")
+                rs.getString("OrderID"),
+                rs.getString("order_date"),
+                rs.getString("order_description"),
             };
             tableModel.addRow(row);
         }
@@ -137,24 +135,16 @@ public class Menu extends JPanel implements Refreshable{
     @Override
     public void createFields() throws Exception{
         inputPanel.removeAll(); 
-        inputPanel.setLayout(new GridLayout(6, 2, 50, 50));
-        
-        JLabel fname = new JLabel("First Name:");
-        JTextField ftext = new JTextField();
-        JLabel lname = new JLabel("Last Name:");
+        inputPanel.setLayout(new GridLayout(2, 2, 10, 200));
+
+        JLabel lname = new JLabel("Order Description(Dine-in/Take-out):");
         JTextField ltext = new JTextField();
-        JLabel role = new JLabel("Role:");
-        JTextField rtext = new JTextField();
-        JLabel email = new JLabel("Email:");
-        JTextField etext = new JTextField();
-        JLabel phone = new JLabel("Phone Number:");
-        JTextField ptext = new JTextField();
-        JLabel[] labels = {fname,lname,role,email,phone};
-        JTextField[] texts = {ftext,ltext,rtext,etext,ptext};
+        JLabel[] labels = {lname};
+        JTextField[] texts = {ltext};
         JButton save = new JButton("Save");
         JButton clear = new JButton("Clear");
-        for(int i = 0; i < 5; i++){
-            labels[i].setFont(new Font("Arial", Font.BOLD, 20));
+        for(int i = 0; i < 1; i++){
+            labels[i].setFont(new Font("Arial", Font.BOLD, 10));
             inputPanel.add(labels[i]);
             inputPanel.add(texts[i]);
         }
@@ -166,26 +156,22 @@ public class Menu extends JPanel implements Refreshable{
                 try {
                     Connection conn = Database.getConnection();
 
-                    String getLastID = "SELECT EmployeeID FROM employee ORDER BY EmployeeID DESC LIMIT 1";
+                    String getLastID = "SELECT OrderID FROM orders ORDER BY OrderID DESC LIMIT 1";
                     PreparedStatement getLastStmt = conn.prepareStatement(getLastID);
                     ResultSet rs = getLastStmt.executeQuery();
 
-                    String newEmployeeID = "E001"; // Default for first employee
+                    String newOrderID = "O001"; // Default for first orders
                     if (rs.next()) {
-                        String lastID = rs.getString("EmployeeID"); // Example: "E005"
+                        String lastID = rs.getString("OrderID"); // Example: "E005"
                         int lastNum = Integer.parseInt(lastID.substring(1)); // Extract number (5)
-                        newEmployeeID = String.format("E%03d", lastNum + 1); // Increment and format ("E006")
+                        newOrderID = String.format("O%03d", lastNum + 1); // Increment and format ("E006")
                     }
                     rs.close();
                     getLastStmt.close();
-                    String sql = "INSERT INTO employee(EmployeeID,first_name,last_name,JobRoleID,phone_number,email) VALUES(?,?,?,?,?,?)";
+                    String sql = "INSERT INTO orders(OrderID,order_description) VALUES(?,?)";
                     PreparedStatement stmt = conn.prepareStatement(sql);
-                    stmt.setString(1, newEmployeeID);
-                    stmt.setString(2, ftext.getText());
-                    stmt.setString(3, ltext.getText());
-                    stmt.setString(4, rtext.getText());
-                    stmt.setString(5, ptext.getText());
-                    stmt.setString(6, etext.getText());
+                    stmt.setString(1, newOrderID);
+                    stmt.setString(2, ltext.getText());
                     stmt.executeUpdate();
                     for(JTextField text : texts){
                         text.setText("");
@@ -222,26 +208,26 @@ public class Menu extends JPanel implements Refreshable{
         JPanel searchWrapper = new JPanel();
         searchWrapper.setLayout(new BoxLayout(searchWrapper, BoxLayout.Y_AXIS));
     
-        JComboBox<String> employeeDropDown = new JComboBox<>(new String[]{"Employee_ID", "Employee_Name", "Role"});
+        JComboBox<String> orderDropDown = new JComboBox<>(new String[]{"OrderID", "Order Date", "Order Description"});
         JTextField input = new JTextField(15);
     
-        searchWrapper.add(addPadding(EsearchHeader(employeeDropDown)));
+        searchWrapper.add(addPadding(EsearchHeader(orderDropDown)));
         searchWrapper.add(addPadding(Esearchinputs(input)));
-        searchWrapper.add(addPadding(Esearchbtn(employeeDropDown, input)));
+        searchWrapper.add(addPadding(Esearchbtn(orderDropDown, input)));
     
         inputPanel.add(searchWrapper);
         inputPanel.revalidate();
         inputPanel.repaint();
     }
     
-    private JPanel EsearchHeader(JComboBox<String> employeeDropDown) {
+    private JPanel EsearchHeader(JComboBox<String> orderDropDown) {
         JPanel searchBox = new JPanel();
         JLabel label = new JLabel("Search By: ");
-        employeeDropDown.setPreferredSize(new Dimension(200, 50));
+        orderDropDown.setPreferredSize(new Dimension(200, 50));
     
         searchBox.setLayout(new FlowLayout(FlowLayout.CENTER));
         searchBox.add(label);
-        searchBox.add(employeeDropDown);
+        searchBox.add(orderDropDown);
         return searchBox;
     }
     
@@ -254,31 +240,31 @@ public class Menu extends JPanel implements Refreshable{
         searchBox.add(input);
         return searchBox;
     }
-    private JPanel Esearchbtn(JComboBox<String> employee, JTextField input){
+    private JPanel Esearchbtn(JComboBox<String> order, JTextField input){
         JPanel searchBox = new JPanel();
         JButton search = new JButton("Search");
         search.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e){
-                String searchCriteria = (String)employee.getSelectedItem();
+                String searchCriteria = (String)order.getSelectedItem();
                 String searchText = input.getText();
                 try {
                     Connection conn = Database.getConnection();
                     String sql = "";
                     PreparedStatement stmt = null;
                     switch (searchCriteria) {
-                        case "Employee_ID":
-                            sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE employeeID LIKE ? ORDER BY employeeID ASC";
+                        case "OrderID":
+                            sql = "SELECT OrderID,order_date,order_description FROM orders WHERE OrderID LIKE ? ORDER BY OrderID ASC";
                             stmt = conn.prepareStatement(sql);
                             stmt.setString(1, "%"+searchText+"%");
                             break;
-                        case "Employee_Name":
-                            sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE employeeName LIKE ?";
+                        case "Order Date":
+                            sql = "SELECT OrderID,order_date,order_description FROM orders WHERE order_date LIKE ?";
                             stmt = conn.prepareStatement(sql);
                             stmt.setString(1, searchText+"%");
                             break;
-                        case "Role":
-                            sql = "SELECT employeeID,employeeName,role,email,phone_number FROM employee_view WHERE role LIKE ?";
+                        case "Order Description":
+                            sql = "SELECT OrderID,order_date,order_description FROM orders WHERE order_description LIKE ?";
                             stmt = conn.prepareStatement(sql);
                             stmt.setString(1, searchText+"%");
                             break;
@@ -347,13 +333,13 @@ public class Menu extends JPanel implements Refreshable{
             public void actionPerformed(ActionEvent e){
                 try {
                     Connection conn = Database.getConnection();
-                    String sql = "SELECT employeeID FROM employee_view WHERE employeeID = ?";
+                    String sql = "SELECT OrderID FROM orders WHERE OrderID = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
                     stmt.setString(1, text.getText());
                     ResultSet rs = stmt.executeQuery();
 
                     while(rs.next()){
-                        String id = rs.getString("employeeID");
+                        String id = rs.getString("OrderID");
                         if(id.equals(text.getText())){
                             EupdateRecord(text.getText());
                             break;
@@ -384,23 +370,15 @@ public class Menu extends JPanel implements Refreshable{
 
     public void EupdateRecord(String input){
         inputPanel.removeAll(); 
-        inputPanel.setLayout(new GridLayout(6, 2, 50, 50));
+        inputPanel.setLayout(new GridLayout(2, 2, 50, 50));
         
-        JLabel fname = new JLabel("First Name:");
+        JLabel fname = new JLabel("Order Description:");
         JTextField ftext = new JTextField();
-        JLabel lname = new JLabel("Last Name:");
-        JTextField ltext = new JTextField();
-        JLabel role = new JLabel("Role:");
-        JTextField rtext = new JTextField();
-        JLabel email = new JLabel("Email:");
-        JTextField etext = new JTextField();
-        JLabel phone = new JLabel("Phone Number:");
-        JTextField ptext = new JTextField();
-        JLabel[] labels = {fname,lname,role,email,phone};
-        JTextField[] texts = {ftext,ltext,rtext,etext,ptext};
+        JLabel[] labels = {fname};
+        JTextField[] texts = {ftext};
         JButton save = new JButton("Save");
         JButton clear = new JButton("Clear");
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i <1; i++){
             inputPanel.add(labels[i]);
             inputPanel.add(texts[i]);
         }
@@ -411,14 +389,10 @@ public class Menu extends JPanel implements Refreshable{
             public void actionPerformed(ActionEvent e){
                 try {
                     Connection conn = Database.getConnection();
-                    String sql = "UPDATE employee SET first_name = ?, last_name = ?, JobRoleID = ?, phone_number = ?, email = ? WHERE employeeID = ?";
+                    String sql = "UPDATE orders SET order_description = ? WHERE OrderID = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
                     stmt.setString(1, ftext.getText());
-                    stmt.setString(2, ltext.getText());
-                    stmt.setString(3, rtext.getText());
-                    stmt.setString(4, ptext.getText());
-                    stmt.setString(5, etext.getText());
-                    stmt.setString(6, input);
+                    stmt.setString(2, input);
                     stmt.executeUpdate();
                     for(JTextField text : texts){
                         text.setText("");
@@ -476,11 +450,12 @@ public class Menu extends JPanel implements Refreshable{
             public void actionPerformed(ActionEvent e){
                 try {
                     Connection conn = Database.getConnection();
-                    String sql = "DELETE FROM employee WHERE employeeID = ?";
+                    String sql = "DELETE FROM orders WHERE OrderID = ?";
                     PreparedStatement stmt = conn.prepareStatement(sql);
                     stmt.setString(1, text.getText());
                     stmt.executeUpdate();
                     conn.close();
+                    text.setText("");
                         refreshTable();  // Add this!
                 } catch (Exception x) {
                     // TODO: handle exception
