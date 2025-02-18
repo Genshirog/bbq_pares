@@ -1,0 +1,15 @@
+Copy the abstract fields just replace sql queries
+Just copy paste refresh table, update table and the display table
+try {
+            refreshTable();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(this, 
+                "Error loading table data: " + e.getMessage(),
+                "Error",
+                JOptionPane.ERROR_MESSAGE);
+        }
+important to display table before any functions
+
+Found solution for OrderItems, Order, Receipt
+currently thinking if receipt should be nulled.
+Are we gonna create a Product table?
