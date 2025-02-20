@@ -39,6 +39,7 @@ public class ButtonHandler implements ActionListener{
                             break;
                         case "Search Employee":
                                 refreshable.searchFields();
+                            break;
                         case "Update Employee":
                                 refreshable.updateFields();
                             
