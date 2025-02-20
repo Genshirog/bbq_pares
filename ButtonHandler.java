@@ -43,7 +43,7 @@ public class ButtonHandler implements ActionListener{
                         case "Update Employee":
                                 refreshable.updateFields();
                             
-                            break;
+                            break;  
                         case "Delete Employee":
                                 refreshable.deleteFields();
                             break;
