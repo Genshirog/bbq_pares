@@ -77,7 +77,7 @@
     -fx-padding: 20px;
     -fx-font-size: 12.5px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
+    -fx-text-fill: black;
 
 }
 
@@ -90,7 +90,7 @@
 }
 
 .combo-box .list-cell{
-    -fx-text-fill: white;
+    -fx-text-fill: black;
     -fx-background-color: transparent;
     -fx-background-radius: 35px;
 }
@@ -121,8 +121,9 @@
     -fx-pref-height: 30px;
     -fx-max-width: 500px;
     -fx-max-height: 30px;
-    -fx-text-fill: white;
+    -fx-text-fill: black;
     -fx-font-size: 15px;
+    -fx-font-weight: bold;
     -fx-padding: 10px;
 }
 

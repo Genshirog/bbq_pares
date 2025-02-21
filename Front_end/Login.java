@@ -1,5 +1,6 @@
 package Front_end;
 
+import Back_end.LoginHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,8 +19,9 @@ import javafx.scene.control.*;
 
 public class Login {
     private final StackPane root;
-
+    private final SceneManager scene;
     public Login(SceneManager sceneManager){
+        this.scene = sceneManager;
         root = new StackPane();
         root.getStyleClass().add("root_form");
         root.getChildren().add(overlay());
@@ -99,7 +101,7 @@ public class Login {
         username_container.getStyleClass().add("containerForm");
 
         HBox password_container = new HBox();
-        TextField passText = new TextField();
+        PasswordField passText = new PasswordField();
         passText.setPromptText("Password:");
         passText.getStyleClass().add("textfield");
         Pane lockIcon = new Pane();
@@ -115,18 +117,23 @@ public class Login {
         roles.setOnMouseClicked(event -> playFadeIn(roles));
         dropbox_container.getStyleClass().add("containerForm");
 
+        Label errormsg = new Label();
+        errormsg.setStyle("-fx-text-fill:red; -fx-font-size: 14px;");
+        errormsg.setVisible(false);
+
         HBox button_container = new HBox();
         Button loginbtn = new Button();
         loginbtn.setText("Login");
         loginbtn.getStyleClass().addAll("btn","border-radius", "background-radius");
         button_container.getStyleClass().add("containerForm");
+        loginbtn.setOnAction(new LoginHandler(userText,passText,roles,errormsg,this.scene));
 
         center.setAlignment(Pos.CENTER);
         button_container.getChildren().add(loginbtn);
         dropbox_container.getChildren().add(roles);
         username_container.getChildren().addAll(userText,personIcon);
         password_container.getChildren().addAll(passText,lockIcon);
-        center.getChildren().addAll(username_container,password_container,dropbox_container,button_container);
+        center.getChildren().addAll(username_container,password_container,dropbox_container,errormsg,button_container);
         login_container.getChildren().add(login);
         form.getChildren().addAll(login_container,center);
         return form;
@@ -134,9 +141,7 @@ public class Login {
 
     private Rectangle rect(){
         GaussianBlur blur = new GaussianBlur(10);
-        Rectangle rect = new Rectangle(700,500, Color.color(1,1,1,0.37));
-        rect.setStroke(Color.BLACK);
-        rect.setStrokeWidth(5);
+        Rectangle rect = new Rectangle(700,500, Color.color(1,1,1,0.5));
         rect.setArcHeight(60);
         rect.setArcWidth(60);
         rect.setEffect(blur);
