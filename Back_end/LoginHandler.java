@@ -4,7 +4,6 @@ import Front_end.SceneManager;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 public class LoginHandler implements EventHandler<ActionEvent> {
@@ -26,8 +25,14 @@ public class LoginHandler implements EventHandler<ActionEvent> {
         String username = this.username.getText();
         String password = this.password.getText();
         String role = this.role.getValue();
-        if(username.equals("Dog") && password.equals("Cat") && role.equals("Cashier")){
-            this.scene.show_main_app();
+        if(username.equals("Dog") && password.equals("Cat") && role.equals("Manager")){
+            this.scene.show_main_manager();
+            this.errormsg.setVisible(false);
+        }else if(username.equals("Dog") && password.equals("Cat") && role.equals("Cashier")){
+            this.scene.show_main_cashier();
+            this.errormsg.setVisible(false);
+        }else if(username.equals("Dog") && password.equals("Cat") && role.equals("Inventory Clerk")){
+            this.scene.show_main_inventory();
             this.errormsg.setVisible(false);
         }else{
             shakeFields();

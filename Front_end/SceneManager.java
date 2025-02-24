@@ -18,9 +18,7 @@ public class SceneManager {
 
         stage.setScene(login_scene);
         stage.setResizable(true);
-        stage.setMaximized(false);
         stage.setMaximized(true);
-        stage.setResizable(false);
         FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), login.getRoot());
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
@@ -28,10 +26,10 @@ public class SceneManager {
         stage.show();
     }
 
-    public void show_main_app(){
-        App app = new App(this);
-        app.getRoot().setOpacity(0);
-        Scene app_scene = app.getScene();
+    public void show_main_manager(){
+        Manager manager = new Manager(this);
+        manager.getRoot().setOpacity(0);
+        Scene app_scene = manager.getScene();
         if (currentRoot != null) {
             FadeTransition fadeOut = new FadeTransition(Duration.millis(800), currentRoot);
             fadeOut.setFromValue(1.0);
@@ -40,32 +38,99 @@ public class SceneManager {
             fadeOut.setOnFinished(e -> {
                 stage.setScene(app_scene);
                 stage.setResizable(true);
-                stage.setMaximized(false);
                 stage.setMaximized(true);
-                stage.setResizable(false);
 
-                FadeTransition fadeIn = new FadeTransition(Duration.millis(800), app.getRoot());
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(800), manager.getRoot());
                 fadeIn.setFromValue(0.0);
                 fadeIn.setToValue(1.0);
                 fadeIn.play();
 
-                currentRoot = app.getRoot();
+                currentRoot = manager.getRoot();
             });
 
             fadeOut.play();
         } else {
             stage.setScene(app_scene);
             stage.setResizable(true);
-            stage.setMaximized(false);
             stage.setMaximized(true);
-            stage.setResizable(false);
-
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(800), app.getRoot());
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(800), manager.getRoot());
             fadeIn.setFromValue(0.0);
             fadeIn.setToValue(1.0);
             fadeIn.play();
 
-            currentRoot = app.getRoot();
+            currentRoot = manager.getRoot();
+        }
+    }
+
+    public void show_main_cashier(){
+        Cashier cashier = new Cashier(this);
+        cashier.getRoot().setOpacity(0);
+        Scene app_scene = cashier.getScene();
+        if (currentRoot != null) {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(800), currentRoot);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+
+            fadeOut.setOnFinished(e -> {
+                stage.setScene(app_scene);
+                stage.setResizable(true);
+                stage.setMaximized(true);
+
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(800), cashier.getRoot());
+                fadeIn.setFromValue(0.0);
+                fadeIn.setToValue(1.0);
+                fadeIn.play();
+
+                currentRoot = cashier.getRoot();
+            });
+
+            fadeOut.play();
+        } else {
+            stage.setScene(app_scene);
+            stage.setResizable(true);
+            stage.setMaximized(true);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(800), cashier.getRoot());
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+
+            currentRoot = cashier.getRoot();
+        }
+    }
+
+    public void show_main_inventory(){
+        Inventory inventory = new Inventory(this);
+        inventory.getRoot().setOpacity(0);
+        Scene app_scene = inventory.getScene();
+        if (currentRoot != null) {
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(800), currentRoot);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+
+            fadeOut.setOnFinished(e -> {
+                stage.setScene(app_scene);
+                stage.setResizable(true);
+                stage.setMaximized(true);
+
+                FadeTransition fadeIn = new FadeTransition(Duration.millis(800), inventory.getRoot());
+                fadeIn.setFromValue(0.0);
+                fadeIn.setToValue(1.0);
+                fadeIn.play();
+
+                currentRoot = inventory.getRoot();
+            });
+
+            fadeOut.play();
+        } else {
+            stage.setScene(app_scene);
+            stage.setResizable(true);
+            stage.setMaximized(true);
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(800), inventory.getRoot());
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fadeIn.play();
+
+            currentRoot = inventory.getRoot();
         }
     }
 
