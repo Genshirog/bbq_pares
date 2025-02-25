@@ -83,7 +83,7 @@ public class Login {
 
     private VBox Form(){
         VBox form = new VBox();
-        form.getStyleClass().add("form");
+        form.getStyleClass().add("form-1");
 
         HBox login_container = new HBox();
         Label login = new Label("BBQ LAGAO");

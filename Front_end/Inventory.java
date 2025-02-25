@@ -259,7 +259,7 @@ public class Inventory {
         logoutContainer.getStyleClass().add("logout");
 
         Button logout = new Button("LOG OUT");
-        logout.setOnAction(new ProductInventoryHandler("logout",btnContainer,this,logoutContainer));
+        logout.setOnAction(new LogoutHandler(scene));
         logout.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         logoutContainer.getChildren().add(logout);
         return logoutContainer;
@@ -268,7 +268,7 @@ public class Inventory {
     public void showLogoutButton() {
         logoutContainer.getChildren().clear();
         Button logout = new Button("LOG OUT");
-        logout.setOnAction(new ProductInventoryHandler("logout", btnContainer, this, logoutContainer));
+        logout.setOnAction(new LogoutHandler(scene));
         logout.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
         logoutContainer.getChildren().add(logout);
     }
@@ -277,7 +277,7 @@ public class Inventory {
         logoutContainer.getChildren().clear();
         Button back = new Button("Back");
         back.getStyleClass().addAll("btn-1", "border-radius", "background-radius-1");
-        back.setOnAction(new ProductInventoryHandler("Back", btnContainer, this, logoutContainer));
+        back.setOnAction(new LogoutHandler(scene));
         logoutContainer.getChildren().add(back);
     }
 

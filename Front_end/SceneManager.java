@@ -18,7 +18,9 @@ public class SceneManager {
 
         stage.setScene(login_scene);
         stage.setResizable(true);
+        stage.setMaximized(false);
         stage.setMaximized(true);
+        stage.setResizable(false);
         FadeTransition fadeIn = new FadeTransition(Duration.millis(1000), login.getRoot());
         fadeIn.setFromValue(0.0);
         fadeIn.setToValue(1.0);
@@ -38,7 +40,9 @@ public class SceneManager {
             fadeOut.setOnFinished(e -> {
                 stage.setScene(app_scene);
                 stage.setResizable(true);
+                stage.setMaximized(false);
                 stage.setMaximized(true);
+                stage.setResizable(false);
 
                 FadeTransition fadeIn = new FadeTransition(Duration.millis(800), manager.getRoot());
                 fadeIn.setFromValue(0.0);
@@ -52,7 +56,9 @@ public class SceneManager {
         } else {
             stage.setScene(app_scene);
             stage.setResizable(true);
+            stage.setMaximized(false);
             stage.setMaximized(true);
+            stage.setResizable(false);
             FadeTransition fadeIn = new FadeTransition(Duration.millis(800), manager.getRoot());
             fadeIn.setFromValue(0.0);
             fadeIn.setToValue(1.0);
@@ -74,7 +80,9 @@ public class SceneManager {
             fadeOut.setOnFinished(e -> {
                 stage.setScene(app_scene);
                 stage.setResizable(true);
+                stage.setMaximized(false);
                 stage.setMaximized(true);
+                stage.setResizable(false);
 
                 FadeTransition fadeIn = new FadeTransition(Duration.millis(800), cashier.getRoot());
                 fadeIn.setFromValue(0.0);
@@ -88,7 +96,9 @@ public class SceneManager {
         } else {
             stage.setScene(app_scene);
             stage.setResizable(true);
+            stage.setMaximized(false);
             stage.setMaximized(true);
+            stage.setResizable(false);
             FadeTransition fadeIn = new FadeTransition(Duration.millis(800), cashier.getRoot());
             fadeIn.setFromValue(0.0);
             fadeIn.setToValue(1.0);
@@ -110,7 +120,9 @@ public class SceneManager {
             fadeOut.setOnFinished(e -> {
                 stage.setScene(app_scene);
                 stage.setResizable(true);
+                stage.setMaximized(false);
                 stage.setMaximized(true);
+                stage.setResizable(false);
 
                 FadeTransition fadeIn = new FadeTransition(Duration.millis(800), inventory.getRoot());
                 fadeIn.setFromValue(0.0);
@@ -124,7 +136,9 @@ public class SceneManager {
         } else {
             stage.setScene(app_scene);
             stage.setResizable(true);
+            stage.setMaximized(false);
             stage.setMaximized(true);
+            stage.setResizable(false);
             FadeTransition fadeIn = new FadeTransition(Duration.millis(800), inventory.getRoot());
             fadeIn.setFromValue(0.0);
             fadeIn.setToValue(1.0);

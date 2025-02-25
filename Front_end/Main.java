@@ -12,7 +12,7 @@ public class Main extends Application{
     public void start(Stage primaryStage) throws Exception{
         try {
             SceneManager sceneManager = new SceneManager(primaryStage);
-            sceneManager.show_main_inventory();
+            sceneManager.show_login();
             Image icon = new Image(getClass().getResourceAsStream("/logo.png"));
             primaryStage.getIcons().add(icon);
             primaryStage.setTitle("BBQ_PARES");
