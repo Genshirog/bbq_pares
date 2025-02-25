@@ -3,6 +3,8 @@ package Front_end;
 import Back_end.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,9 +24,12 @@ public class Manager {
     private VBox left_panel;
     private VBox btnContainer;
     private VBox logoutContainer;
+    private HBox comboHolder;
+    private TableManager tableManager;
     public Manager(SceneManager scene){
         this.scene = scene;
         this.btnContainer = new VBox(10);
+        this.tableManager = new TableManager();
         root = new StackPane();
         root.getStyleClass().add("root_form");
         //root.setOpacity(0);
@@ -82,21 +87,32 @@ public class Manager {
         return right_panel;
     }
 
-    private VBox comboHolder(){
-        VBox comboHolder = new VBox();
+    private HBox comboHolder(){
+        comboHolder = new HBox(20);
         comboHolder.getStyleClass().addAll("holder","p-2");
         comboHolder.getChildren().add(views());
         return comboHolder;
     }
+
+    public void originalComboHolder(){
+        comboHolder.getChildren().clear();
+        comboHolder.getChildren().add(views());
+    }
+
+    public void updateComboHolder(ComboBox<String> combo){
+        comboHolder.getChildren().clear();
+        TextField input = new TextField();
+        input.getStyleClass().addAll("textfield-2","border-radius","background-radius");
+        comboHolder.getChildren().addAll(combo,input);
+    }
+
+    public void clearComboHolder(){
+        comboHolder.getChildren().clear();
+    }
+
     private VBox tableHolder(){
         VBox tableHolder = new VBox();
         tableHolder.getStyleClass().add("table");
-        return tableHolder;
-    }
-
-    private VBox formHolder(){
-        VBox tableHolder = new VBox();
-        tableHolder.getStyleClass().add("form");
         return tableHolder;
     }
 
@@ -118,144 +134,54 @@ public class Manager {
 
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-
             if("Employee View".equals(selectedView)){
-                tableHolder.getChildren().add(createEmployeeTable());
+                tableHolder.getChildren().add(tableManager.createEmployeeTable());
             }else if("Inventory View".equals(selectedView)){
-                tableHolder.getChildren().add(createInventoryTable());
+                tableHolder.getChildren().add(tableManager.createInventoryTable());
             }else if("Menu".equals(selectedView)){
-                tableHolder.getChildren().add(createMenuTable());
+                tableHolder.getChildren().add(tableManager.createMenuTable());
+            }else{
+                System.out.println("Does not exist");
             }
         }
     }
 
-    private VBox createEmployeeTable() {
-        // Create Employee Table
-        TableView<EmployeeViews> table = new TableView<>();
-
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("EmployeeID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("employeeId"));
-        idColumn.setMaxWidth(250);
-        idColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> nameColumn = new TableColumn<>("Employee Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("employeeName"));
-        nameColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> roleColumn = new TableColumn<>("Role");
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        roleColumn.setMaxWidth(100);
-        roleColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        emailColumn.setMaxWidth(100);
-        emailColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> phoneColumn = new TableColumn<>("Phone Number");
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
-        phoneColumn.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, roleColumn, emailColumn, phoneColumn);
-        table.setTableMenuButtonVisible(false);
-
-        VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        ScrollPane scrollPane = new ScrollPane(table);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        VBox.setVgrow(table,Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        return new VBox(scrollPane);
+    public void displayForm(GridPane form){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(form);
+        }
     }
 
-    private VBox createInventoryTable(){
-        TableView<InventoryViews> table = new TableView<>();
+    public void showEmployeeTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
 
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<InventoryViews, String> idColumn = new TableColumn<>("InventoryID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("inventoryID"));
-        idColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> nameColumn = new TableColumn<>("Item Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
-        nameColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        categoryColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> stockColumn = new TableColumn<>("Stock");
-        stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        stockColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> stockInColumn = new TableColumn<>("Date");
-        stockInColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        stockInColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> stockDetails = new TableColumn<>("Details");
-        stockDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
-        stockDetails.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, categoryColumn, stockColumn, stockInColumn,stockDetails);
-
-        VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        ScrollPane scrollPane = new ScrollPane(table);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        VBox.setVgrow(table,Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        return new VBox(scrollPane);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createEmployeeTable());
+        }
     }
 
-    private VBox createMenuTable(){
-        TableView<MenuViews> table = new TableView<>();
+    public void showRolesTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
 
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<MenuViews, String> idColumn = new TableColumn<>("MenuID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("menuID"));
-        idColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> nameColumn = new TableColumn<>("Item Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
-        nameColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        categoryColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> priceColumn = new TableColumn<>("Price");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        priceColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> availabilityColumn = new TableColumn<>("Availability");
-        availabilityColumn.setCellValueFactory(new PropertyValueFactory<>("availability"));
-        availabilityColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> stockDetails = new TableColumn<>("Details");
-        stockDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
-        stockDetails.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, categoryColumn, priceColumn, availabilityColumn,stockDetails);
-        VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        ScrollPane scrollPane = new ScrollPane(table);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        VBox.setVgrow(table,Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        return new VBox(scrollPane);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createRoleTable());
+        }
     }
 
     private VBox logo_container(){
@@ -301,7 +227,7 @@ public class Manager {
         Button Supplierbtn = new Button("SUPPLIER");
 
         Employeebtn.setOnAction(new EmployeeHandler("employee",btnContainer,this,logoutContainer));
-        Rolesbtn.setOnAction(new EmployeeHandler("roles",btnContainer,this,logoutContainer));
+        Rolesbtn.setOnAction(new RolesHandler("roles",btnContainer,this,logoutContainer));
         Productbtn.setOnAction(new EmployeeHandler("products",btnContainer,this,logoutContainer));
         Supplierbtn.setOnAction(new EmployeeHandler("supplier",btnContainer,this,logoutContainer));
 

@@ -58,6 +58,12 @@
     -fx-text-fill: white;
 }
 
+.label-1{
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
 .containerForm{
     -fx-max-width: 500px;
     -fx-max-height: 30px;
@@ -78,7 +84,26 @@
     -fx-font-size: 12.5px;
     -fx-font-weight: bold;
     -fx-text-fill: black;
+}
 
+.textfield-1{
+    -fx-pref-width: 300px;
+    -fx-pref-height: 20px;
+    -fx-max-height: 20px;
+    -fx-padding: 20px;
+    -fx-font-size: 12.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: black;
+}
+
+.textfield-2{
+    -fx-pref-width: 400px;
+    -fx-pref-height: 15px;
+    -fx-max-height: 15px;
+    -fx-padding: 15px;
+    -fx-font-size: 13.5px;
+    -fx-font-weight: bold;
+    -fx-text-fill: white;
 }
 
 .drop_box, .manager-combo {
@@ -350,4 +375,30 @@
     -fx-pref-height: 50px;
     -fx-max-height:100px;
     -fx-alignment: CENTER;
+}
+
+.form{
+    -fx-max-width: 1100px;
+    -fx-pref-width: 1100px;
+    -fx-background-color: rgba(255,255,255,0.5);
+    -fx-alignment: CENTER;
+}
+
+.table-view .column-header,
+.table-view .column-header .label {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-padding: 8px 5px;
+    -fx-alignment: center;
+    -fx-text-fill: black;
+}
+
+.table-view .table-column {
+    -fx-alignment: center-left;
+    -fx-padding: 5px;
+}
+
+.table-view {
+    -fx-focus-color: transparent;
+    -fx-faint-focus-color: transparent;
 }
