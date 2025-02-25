@@ -73,9 +73,9 @@ public class TableManager {
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
         nameColumn.setReorderable(false);
 
-        TableColumn<InventoryViews, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        categoryColumn.setReorderable(false);
+        TableColumn<InventoryViews, String> supplierColumn = new TableColumn<>("Supplier Name");
+        supplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
+        supplierColumn.setReorderable(false);
 
         TableColumn<InventoryViews, String> stockColumn = new TableColumn<>("Stock");
         stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
@@ -85,11 +85,11 @@ public class TableManager {
         stockInColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
         stockInColumn.setReorderable(false);
 
-        TableColumn<InventoryViews, String> stockDetails = new TableColumn<>("Details");
-        stockDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
-        stockDetails.setReorderable(false);
+        TableColumn<InventoryViews, String> stockAvailability = new TableColumn<>("Availability");
+        stockAvailability.setCellValueFactory(new PropertyValueFactory<>("availability"));
+        stockAvailability.setReorderable(false);
 
-        table.getColumns().addAll(idColumn, nameColumn, categoryColumn, stockColumn, stockInColumn,stockDetails);
+        table.getColumns().addAll(idColumn, nameColumn, supplierColumn, stockColumn, stockInColumn,stockAvailability);
 
         VBox.setVgrow(table, Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
@@ -240,19 +240,66 @@ public class TableManager {
         supNameColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> personColumn = new TableColumn<>("Contact Person");
-        personColumn.setCellValueFactory(new PropertyValueFactory<>("prodPrice"));
+        personColumn.setCellValueFactory(new PropertyValueFactory<>("person"));
         personColumn.setMaxWidth(250);
         personColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("prodCost"));
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
         emailColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> phoneColumn = new TableColumn<>("Phone Number");
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("prodSupplier"));
+        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNum"));
         phoneColumn.setReorderable(false);
 
         table.getColumns().addAll(idColumn,supNameColumn,personColumn,emailColumn,phoneColumn);
+        table.setTableMenuButtonVisible(false);
+
+        VBox.setVgrow(table, Priority.ALWAYS);
+        table.setMaxHeight(Double.MAX_VALUE);
+
+        ScrollPane scrollPane = new ScrollPane(table);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setFitToHeight(true);
+
+        VBox.setVgrow(table,Priority.ALWAYS);
+        table.setMaxHeight(Double.MAX_VALUE);
+
+        return new VBox(scrollPane);
+    }
+
+    public VBox createReportTable() {
+        TableView<EmployeeViews> table = new TableView<>();
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("Inventory ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("inventoryID"));
+        idColumn.setMaxWidth(250);
+        idColumn.setReorderable(false);
+
+        TableColumn<EmployeeViews, String> prodNameColumn = new TableColumn<>("Product Name");
+        prodNameColumn.setCellValueFactory(new PropertyValueFactory<>("prodName"));
+        prodNameColumn.setMaxWidth(250);
+        prodNameColumn.setReorderable(false);
+
+        TableColumn<EmployeeViews, String> supNameColumn = new TableColumn<>("Supplier Name");
+        supNameColumn.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
+        supNameColumn.setMaxWidth(250);
+        supNameColumn.setReorderable(false);
+
+        TableColumn<EmployeeViews, String> stockColumn = new TableColumn<>("Stock");
+        stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
+        stockColumn.setMaxWidth(250);
+        stockColumn.setReorderable(false);
+
+        TableColumn<EmployeeViews, String> detailsColumn = new TableColumn<>("Details");
+        detailsColumn.setCellValueFactory(new PropertyValueFactory<>("details"));
+        detailsColumn.setReorderable(false);
+
+        TableColumn<EmployeeViews, String> dateColumn = new TableColumn<>("Date");
+        dateColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
+        dateColumn.setReorderable(false);
+
+        table.getColumns().addAll(idColumn,prodNameColumn,supNameColumn,stockColumn,detailsColumn,dateColumn);
         table.setTableMenuButtonVisible(false);
 
         VBox.setVgrow(table, Priority.ALWAYS);

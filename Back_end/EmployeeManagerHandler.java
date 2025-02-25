@@ -3,46 +3,45 @@ package Back_end;
 import Front_end.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
-public class RolesHandler implements EventHandler<ActionEvent> {
-    private final String btn;;
-    private final Manager manager;
-    private final Refreshable refreshable;
-    public RolesHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
+    private final String btn;
+    private Manager manager;
+    private Refreshable refreshable;
+    public EmployeeManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable = new Roles(buttonContainer,manager,logoutContainer);
+        this.refreshable= new EmployeeManager(buttonContainer, manager, logoutContainer);
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "roles":
+            case "employee":
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
                 manager.showBackButton();
                 break;
-            case "AddRoles":
+            case "AddEmp":
                 System.out.println("Nigga");
                 break;
-            case "SearchRoles":
+            case "SearchEmp":
                 System.out.println("Nigga2");
                 break;
-            case "EditRoles":
+            case "EditEmp":
                 System.out.println("Nigga3");
                 break;
-            case "RemRoles":
+            case "RemEmp":
                 System.out.println("Nigga4");
                 break;
-            case "ViewRoles":
+            case "ViewEmp":
                 refreshable.view_btn();
                 manager.updateComboHolder(refreshable.getCombo());
-                manager.showRolesTable();
+                manager.showEmployeeTable();
                 break;
-            case "FormRoles":
+            case "FormEmp":
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());

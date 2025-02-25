@@ -3,48 +3,45 @@ package Back_end;
 import Front_end.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
-import java.sql.Ref;
-
-public class ProductHandler implements EventHandler<ActionEvent> {
-    private final String btn;
-    private Manager manager;
-    private Refreshable refreshable;
-    public ProductHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+public class RolesManagerHandler implements EventHandler<ActionEvent> {
+    private final String btn;;
+    private final Manager manager;
+    private final Refreshable refreshable;
+    public RolesManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable= new Product(buttonContainer, manager, logoutContainer);
+        this.refreshable = new RolesManager(buttonContainer,manager,logoutContainer);
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "products":
+            case "roles":
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
                 manager.showBackButton();
                 break;
-            case "AddProd":
+            case "AddRoles":
                 System.out.println("Nigga");
                 break;
-            case "SearchProd":
+            case "SearchRoles":
                 System.out.println("Nigga2");
                 break;
-            case "EditProd":
+            case "EditRoles":
                 System.out.println("Nigga3");
                 break;
-            case "RemProd":
+            case "RemRoles":
                 System.out.println("Nigga4");
                 break;
-            case "ViewProd":
+            case "ViewRoles":
                 refreshable.view_btn();
                 manager.updateComboHolder(refreshable.getCombo());
-                manager.showProductTable();
+                manager.showRolesTable();
                 break;
-            case "FormProd":
+            case "FormRoles":
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
@@ -52,7 +49,7 @@ public class ProductHandler implements EventHandler<ActionEvent> {
             case "Back":
                 manager.originalComboHolder();
                 manager.buttonContainer();
-                manager.showProductTable();
+                manager.showEmployeeTable();
                 manager.showLogoutButton();
                 break;
             default:

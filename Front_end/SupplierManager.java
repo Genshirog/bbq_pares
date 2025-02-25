@@ -1,17 +1,16 @@
 package Front_end;
 
-import Back_end.EmployeeHandler;
 import Back_end.Refreshable;
-import Back_end.SupplierHandler;
+import Back_end.SupplierManagerHandler;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class Supplier implements Refreshable {
+public class SupplierManager implements Refreshable {
     private final VBox buttonContainer;
     private final Manager manager;
     private final VBox logoutContainer;
-    public Supplier(VBox buttonContainer, Manager manager, VBox logoutContainer){
+    public SupplierManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
         this.logoutContainer = logoutContainer;
@@ -25,10 +24,10 @@ public class Supplier implements Refreshable {
         Button viewbtn = new Button("View Supplier");
         Button formbtn = new Button("Reset Form");
 
-        searchbtn.setOnAction(new SupplierHandler("SearchSup",buttonContainer,manager,logoutContainer));
-        deletebtn.setOnAction(new SupplierHandler("RemSup",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new SupplierHandler("ViewSup",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new SupplierHandler("FormSup",buttonContainer,manager,logoutContainer));
+        searchbtn.setOnAction(new SupplierManagerHandler("SearchSup",buttonContainer,manager,logoutContainer));
+        deletebtn.setOnAction(new SupplierManagerHandler("RemSup",buttonContainer,manager,logoutContainer));
+        viewbtn.setOnAction(new SupplierManagerHandler("ViewSup",buttonContainer,manager,logoutContainer));
+        formbtn.setOnAction(new SupplierManagerHandler("FormSup",buttonContainer,manager,logoutContainer));
 
 
         Button[] supplierbtns = {searchbtn,deletebtn,viewbtn,formbtn};
@@ -47,10 +46,10 @@ public class Supplier implements Refreshable {
         Button viewbtn = new Button("View Supplier");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new SupplierHandler("AddSup",buttonContainer,manager,logoutContainer));
-        updatebtn.setOnAction(new SupplierHandler("EditSup",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new SupplierHandler("ViewSup",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new SupplierHandler("FormSup",buttonContainer,manager,logoutContainer));
+        createbtn.setOnAction(new SupplierManagerHandler("AddSup",buttonContainer,manager,logoutContainer));
+        updatebtn.setOnAction(new SupplierManagerHandler("EditSup",buttonContainer,manager,logoutContainer));
+        viewbtn.setOnAction(new SupplierManagerHandler("ViewSup",buttonContainer,manager,logoutContainer));
+        formbtn.setOnAction(new SupplierManagerHandler("FormSup",buttonContainer,manager,logoutContainer));
 
 
         Button[] supplierbtns = {createbtn,updatebtn,viewbtn,formbtn};

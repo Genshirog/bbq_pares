@@ -1,16 +1,16 @@
 package Front_end;
 
-import Back_end.EmployeeHandler;
+import Back_end.EmployeeManagerHandler;
 import Back_end.Refreshable;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class Employee implements Refreshable {
+public class EmployeeManager implements Refreshable {
     private final VBox buttonContainer;
     private final Manager manager;
     private final VBox logoutContainer;
-    public Employee(VBox buttonContainer, Manager manager, VBox logoutContainer){
+    public EmployeeManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
         this.logoutContainer = logoutContainer;
@@ -24,10 +24,10 @@ public class Employee implements Refreshable {
         Button viewbtn = new Button("View Employee");
         Button formbtn = new Button("Reset Form");
 
-        searchbtn.setOnAction(new EmployeeHandler("SearchEmp",buttonContainer,manager,logoutContainer));
-        deletebtn.setOnAction(new EmployeeHandler("RemEmp",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new EmployeeHandler("ViewEmp",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new EmployeeHandler("FormEmp",buttonContainer,manager,logoutContainer));
+        searchbtn.setOnAction(new EmployeeManagerHandler("SearchEmp",buttonContainer,manager,logoutContainer));
+        deletebtn.setOnAction(new EmployeeManagerHandler("RemEmp",buttonContainer,manager,logoutContainer));
+        viewbtn.setOnAction(new EmployeeManagerHandler("ViewEmp",buttonContainer,manager,logoutContainer));
+        formbtn.setOnAction(new EmployeeManagerHandler("FormEmp",buttonContainer,manager,logoutContainer));
 
 
         Button[] employeebtns = {searchbtn,deletebtn,viewbtn,formbtn};
@@ -46,10 +46,10 @@ public class Employee implements Refreshable {
         Button viewbtn = new Button("View Employee");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new EmployeeHandler("AddEmp",buttonContainer,manager,logoutContainer));
-        updatebtn.setOnAction(new EmployeeHandler("EditEmp",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new EmployeeHandler("ViewEmp",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new EmployeeHandler("FormEmp",buttonContainer,manager,logoutContainer));
+        createbtn.setOnAction(new EmployeeManagerHandler("AddEmp",buttonContainer,manager,logoutContainer));
+        updatebtn.setOnAction(new EmployeeManagerHandler("EditEmp",buttonContainer,manager,logoutContainer));
+        viewbtn.setOnAction(new EmployeeManagerHandler("ViewEmp",buttonContainer,manager,logoutContainer));
+        formbtn.setOnAction(new EmployeeManagerHandler("FormEmp",buttonContainer,manager,logoutContainer));
 
 
         Button[] employeebtns = {createbtn,updatebtn,viewbtn,formbtn};

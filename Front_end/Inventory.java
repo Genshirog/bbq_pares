@@ -6,7 +6,6 @@ import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,8 +19,14 @@ public class Inventory {
     private StackPane root;
     private SceneManager scene;
     private VBox left_panel;
+    private VBox btnContainer;
+    private VBox logoutContainer;
+    private HBox comboHolder;
+    private TableManager tableManager;
     public Inventory(SceneManager scene){
         this.scene = scene;
+        this.btnContainer = new VBox(10);
+        this.tableManager = new TableManager();
         root = new StackPane();
         root.getStyleClass().add("root_form");
         //root.setOpacity(0);
@@ -63,7 +68,7 @@ public class Inventory {
 
         left_panel.getChildren().addAll(comboHolder(),tableHolder());
 
-        updateContent("Employee View");
+        updateContent("Inventory View");
         return left_panel;
     }
 
@@ -71,32 +76,47 @@ public class Inventory {
         VBox right_panel = new VBox();
         right_panel.getStyleClass().add("right_panel");
         right_panel.prefWidthProperty().bind(contents.widthProperty().multiply(0.25));
-        right_panel.getChildren().addAll(logo_container(),buttonContainer(),logout());
+        logoutContainer = logout();
+
+        buttonContainer();
+
+        right_panel.getChildren().addAll(logo_container(),btnContainer,logoutContainer);
         return right_panel;
     }
 
-    private VBox comboHolder(){
-        VBox comboHolder = new VBox();
+    private HBox comboHolder(){
+        comboHolder = new HBox(20);
         comboHolder.getStyleClass().addAll("holder","p-2");
         comboHolder.getChildren().add(views());
         return comboHolder;
     }
+
+    public void originalComboHolder(){
+        comboHolder.getChildren().clear();
+        comboHolder.getChildren().add(views());
+    }
+
+    public void updateComboHolder(ComboBox<String> combo){
+        comboHolder.getChildren().clear();
+        TextField input = new TextField();
+        input.getStyleClass().addAll("textfield-2","border-radius","background-radius");
+        comboHolder.getChildren().addAll(combo,input);
+    }
+
+    public void clearComboHolder(){
+        comboHolder.getChildren().clear();
+    }
+
     private VBox tableHolder(){
         VBox tableHolder = new VBox();
         tableHolder.getStyleClass().add("table");
         return tableHolder;
     }
 
-    private VBox formHolder(){
-        VBox tableHolder = new VBox();
-        tableHolder.getStyleClass().add("form");
-        return tableHolder;
-    }
-
     private ComboBox<String> views(){
         ComboBox<String> views = new ComboBox<>();
-        views.getItems().addAll("Employee View", "Inventory View", "Menu");
-        views.setValue("Employee View");
+        views.getItems().addAll("Inventory View");
+        views.setValue("Inventory View");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         views.setOnAction(event -> updateContent(views.getValue()));
         return views;
@@ -111,144 +131,76 @@ public class Inventory {
 
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-
-            if("Employee View".equals(selectedView)){
-                tableHolder.getChildren().add(createOrderTable());
-            }else if("Inventory View".equals(selectedView)){
-                tableHolder.getChildren().add(createRecieptTable());
-            }else if("Menu".equals(selectedView)){
-                tableHolder.getChildren().add(createMenuTable());
+          if("Inventory View".equals(selectedView)){
+            tableHolder.getChildren().add(tableManager.createInventoryTable());
+            }else{
+                System.out.println("Does not exist");
             }
         }
     }
 
-    private VBox createOrderTable() {
-        // Create Order Table
-        TableView<EmployeeViews> table = new TableView<>();
-
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("EmployeeID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("employeeId"));
-        idColumn.setMaxWidth(250);
-        idColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> nameColumn = new TableColumn<>("Employee Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("employeeName"));
-        nameColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> roleColumn = new TableColumn<>("Role");
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        roleColumn.setMaxWidth(100);
-        roleColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        emailColumn.setMaxWidth(100);
-        emailColumn.setReorderable(false);
-
-        TableColumn<EmployeeViews, String> phoneColumn = new TableColumn<>("Phone Number");
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
-        phoneColumn.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, roleColumn, emailColumn, phoneColumn);
-        table.setTableMenuButtonVisible(false);
-
-        VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        ScrollPane scrollPane = new ScrollPane(table);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        VBox.setVgrow(table,Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        return new VBox(scrollPane);
+    public void displayForm(GridPane form){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(form);
+        }
     }
 
-    private VBox createRecieptTable(){
-        TableView<InventoryViews> table = new TableView<>();
+    public void showProductTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
 
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<InventoryViews, String> idColumn = new TableColumn<>("InventoryID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("inventoryID"));
-        idColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> nameColumn = new TableColumn<>("Item Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
-        nameColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        categoryColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> stockColumn = new TableColumn<>("Stock");
-        stockColumn.setCellValueFactory(new PropertyValueFactory<>("stock"));
-        stockColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> stockInColumn = new TableColumn<>("Date");
-        stockInColumn.setCellValueFactory(new PropertyValueFactory<>("date"));
-        stockInColumn.setReorderable(false);
-
-        TableColumn<InventoryViews, String> stockDetails = new TableColumn<>("Details");
-        stockDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
-        stockDetails.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, categoryColumn, stockColumn, stockInColumn,stockDetails);
-
-        VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        ScrollPane scrollPane = new ScrollPane(table);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        VBox.setVgrow(table,Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        return new VBox(scrollPane);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createProductTable());
+        }
     }
 
-    private VBox createMenuTable(){
-        TableView<MenuViews> table = new TableView<>();
+    public void showSupplierTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
 
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<MenuViews, String> idColumn = new TableColumn<>("MenuID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("menuID"));
-        idColumn.setReorderable(false);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createSupplierTable());
+        }
+    }
 
-        TableColumn<MenuViews, String> nameColumn = new TableColumn<>("Item Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
-        nameColumn.setReorderable(false);
+    public void showInventoryTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
 
-        TableColumn<MenuViews, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        categoryColumn.setReorderable(false);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createInventoryTable());
+        }
+    }
 
-        TableColumn<MenuViews, String> priceColumn = new TableColumn<>("Price");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
-        priceColumn.setReorderable(false);
+    public void showReportTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
 
-        TableColumn<MenuViews, String> availabilityColumn = new TableColumn<>("Availability");
-        availabilityColumn.setCellValueFactory(new PropertyValueFactory<>("availability"));
-        availabilityColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> stockDetails = new TableColumn<>("Details");
-        stockDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
-        stockDetails.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, categoryColumn, priceColumn, availabilityColumn,stockDetails);
-        VBox.setVgrow(table, Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        ScrollPane scrollPane = new ScrollPane(table);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setFitToHeight(true);
-
-        VBox.setVgrow(table,Priority.ALWAYS);
-        table.setMaxHeight(Double.MAX_VALUE);
-
-        return new VBox(scrollPane);
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createReportTable());
+        }
     }
 
     private VBox logo_container(){
@@ -284,30 +236,49 @@ public class Inventory {
         return logo;
     }
 
-    private VBox buttonContainer(){
-        VBox buttonContainer = new VBox(10);
-        buttonContainer.getStyleClass().add("btncontainer");
+    public void buttonContainer(){
+        btnContainer.getChildren().clear();
+        btnContainer.getStyleClass().add("btncontainer");
 
-        Button Employeebtn = new Button("EMPLOYEE");
-        Button Rolesbtn = new Button("ROLES");
         Button Productbtn = new Button("PRODUCTS");
         Button Supplierbtn = new Button("SUPPLIER");
+        Button Reportbtn = new Button("REPORT");
 
-        Employeebtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
-        Rolesbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
+        Reportbtn.setOnAction(new ReportInventoryHandler("report",btnContainer,this,logoutContainer));
+        Productbtn.setOnAction(new ProductInventoryHandler("products",btnContainer,this,logoutContainer));
+        Supplierbtn.setOnAction(new SupplierInventoryHandler("supplier",btnContainer,this,logoutContainer));
+
+        Reportbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         Productbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         Supplierbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
-        buttonContainer.getChildren().addAll(Employeebtn,Rolesbtn,Productbtn,Supplierbtn);
-        return buttonContainer;
+        btnContainer.getChildren().addAll(Productbtn,Supplierbtn,Reportbtn);
     }
 
-    private VBox logout(){
-        VBox logoutContainer = new VBox();
+    public VBox logout(){
+        logoutContainer = new VBox();
         logoutContainer.getStyleClass().add("logout");
 
         Button logout = new Button("LOG OUT");
-        logout.getStyleClass().addAll("btn-1","background-radius","border-radius");
+        logout.setOnAction(new ProductInventoryHandler("logout",btnContainer,this,logoutContainer));
+        logout.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         logoutContainer.getChildren().add(logout);
         return logoutContainer;
     }
+
+    public void showLogoutButton() {
+        logoutContainer.getChildren().clear();
+        Button logout = new Button("LOG OUT");
+        logout.setOnAction(new ProductInventoryHandler("logout", btnContainer, this, logoutContainer));
+        logout.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
+        logoutContainer.getChildren().add(logout);
+    }
+
+    public void showBackButton() {
+        logoutContainer.getChildren().clear();
+        Button back = new Button("Back");
+        back.getStyleClass().addAll("btn-1", "border-radius", "background-radius-1");
+        back.setOnAction(new ProductInventoryHandler("Back", btnContainer, this, logoutContainer));
+        logoutContainer.getChildren().add(back);
+    }
+
 }

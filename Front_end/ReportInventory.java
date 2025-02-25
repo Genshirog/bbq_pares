@@ -1,59 +1,58 @@
 package Front_end;
 
-import Back_end.ProductHandler;
+import Back_end.ReportInventoryHandler;
 import Back_end.Refreshable;
-import javafx.scene.control.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class Product implements Refreshable {
+public class ReportInventory implements Refreshable {
     private final VBox buttonContainer;
-    private final Manager manager;
+    private final Inventory inventory;
     private final VBox logoutContainer;
-    public Product(VBox buttonContainer, Manager manager, VBox logoutContainer){
+    public ReportInventory(VBox buttonContainer, Inventory inventory, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
-        this.manager = manager;
+        this.inventory = inventory;
         this.logoutContainer = logoutContainer;
     }
 
     @Override
     public void view_btn(){
         buttonContainer.getChildren().clear();
-        Button searchbtn = new Button("Search Product");
-        Button deletebtn = new Button("Remove Product");
-        Button viewbtn = new Button("View Product");
-        Button formbtn = new Button("Reset Form");
+        Button searchbtn = new Button("Search Report");
+        Button viewbtn = new Button("View Report");
 
-        searchbtn.setOnAction(new ProductHandler("SearchProd",buttonContainer,manager,logoutContainer));
-        deletebtn.setOnAction(new ProductHandler("RemProd",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new ProductHandler("ViewProd",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new ProductHandler("FormProd",buttonContainer,manager,logoutContainer));
+        searchbtn.setOnAction(new ReportInventoryHandler("SearchRepo",buttonContainer,inventory,logoutContainer));
+        viewbtn.setOnAction(new ReportInventoryHandler("ViewRepo",buttonContainer,inventory,logoutContainer));
 
 
-        Button[] employeebtns = {searchbtn,deletebtn,viewbtn,formbtn};
-        for(Button button:employeebtns){
+        Button[] reportbtns = {searchbtn,viewbtn};
+        for(Button button:reportbtns){
             button.getStyleClass().addAll("btn-1","border-radius","background-radius-1");
         }
 
-        buttonContainer.getChildren().addAll(searchbtn,deletebtn,viewbtn,formbtn);
+        buttonContainer.getChildren().addAll(searchbtn,viewbtn);
     }
 
     @Override
     public void form_btn(){
         buttonContainer.getChildren().clear();
-        Button createbtn = new Button("Add Product");
-        Button updatebtn = new Button("Edit Product");
-        Button viewbtn = new Button("View Product");
+        Button createbtn = new Button("Add Report");
+        Button updatebtn = new Button("Edit Report");
+        Button viewbtn = new Button("View Report");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new ProductHandler("AddProd",buttonContainer,manager,logoutContainer));
-        updatebtn.setOnAction(new ProductHandler("EditProd",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new ProductHandler("ViewProd",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new ProductHandler("FormProd",buttonContainer,manager,logoutContainer));
+        createbtn.setOnAction(new ReportInventoryHandler("AddRepo",buttonContainer,inventory,logoutContainer));
+        updatebtn.setOnAction(new ReportInventoryHandler("EditRepo",buttonContainer,inventory,logoutContainer));
+        viewbtn.setOnAction(new ReportInventoryHandler("ViewRepo",buttonContainer,inventory,logoutContainer));
+        formbtn.setOnAction(new ReportInventoryHandler("FormRepo",buttonContainer,inventory,logoutContainer));
 
 
-        Button[] employeebtns = {createbtn,updatebtn,viewbtn,formbtn};
-        for(Button button:employeebtns){
+        Button[] reportbtns = {createbtn,updatebtn,viewbtn,formbtn};
+        for(Button button:reportbtns){
             button.getStyleClass().addAll("btn-1","border-radius","background-radius-1");
         }
 
@@ -66,12 +65,12 @@ public class Product implements Refreshable {
         form.setVgap(50);
         form.setHgap(20);
 
-        Label id = new Label("Product ID");
+        Label id = new Label("Report ID");
         TextField empID = new TextField();
         form.add(id,0,0);
         form.add(empID,1,0);
 
-        Label pname = new Label("Product Name");
+        Label pname = new Label("Report Name");
         TextField prodName = new TextField();
         form.add(pname,2,0);
         form.add(prodName,3,0);
@@ -108,16 +107,16 @@ public class Product implements Refreshable {
         return formHolder();
     }
 
-    private ComboBox<String> supplierCombo(){
+    private ComboBox<String> reportCombo(){
         ComboBox<String> views = new ComboBox<>();
-        views.getItems().addAll("Product ID", "Product Name", "Supplier");
-        views.setValue("Product ID");
+        views.getItems().addAll("Inventory ID", "Product Name", "Supplier Name");
+        views.setValue("Inventory ID");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         return views;
     }
 
     @Override
     public ComboBox<String> getCombo(){
-        return supplierCombo();
+        return reportCombo();
     }
 }

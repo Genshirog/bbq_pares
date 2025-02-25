@@ -1,16 +1,16 @@
 package Front_end;
 
 import Back_end.Refreshable;
-import Back_end.RolesHandler;
+import Back_end.RolesManagerHandler;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
-public class Roles implements Refreshable {
+public class RolesManager implements Refreshable {
     private final VBox buttonContainer;
     private final Manager manager;
     private final VBox logoutContainer;
-    public Roles(VBox buttonContainer, Manager manager, VBox logoutContainer){
+    public RolesManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
         this.logoutContainer = logoutContainer;
@@ -24,10 +24,10 @@ public class Roles implements Refreshable {
         Button viewbtn = new Button("View Roles");
         Button formbtn = new Button("Reset Form");
 
-        searchbtn.setOnAction(new RolesHandler("SearchRoles",buttonContainer,manager,logoutContainer));
-        deletebtn.setOnAction(new RolesHandler("RemRoles",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new RolesHandler("ViewRoles",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new RolesHandler("FormRoles",buttonContainer,manager,logoutContainer));
+        searchbtn.setOnAction(new RolesManagerHandler("SearchRoles",buttonContainer,manager,logoutContainer));
+        deletebtn.setOnAction(new RolesManagerHandler("RemRoles",buttonContainer,manager,logoutContainer));
+        viewbtn.setOnAction(new RolesManagerHandler("ViewRoles",buttonContainer,manager,logoutContainer));
+        formbtn.setOnAction(new RolesManagerHandler("FormRoles",buttonContainer,manager,logoutContainer));
 
 
         Button[] rolesbtn = {searchbtn,deletebtn,viewbtn,formbtn};
@@ -46,10 +46,10 @@ public class Roles implements Refreshable {
         Button viewbtn = new Button("View Roles");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new RolesHandler("AddRoles",buttonContainer,manager,logoutContainer));
-        updatebtn.setOnAction(new RolesHandler("EditRoles",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new RolesHandler("ViewRoles",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new RolesHandler("FormRoles",buttonContainer,manager,logoutContainer));
+        createbtn.setOnAction(new RolesManagerHandler("AddRoles",buttonContainer,manager,logoutContainer));
+        updatebtn.setOnAction(new RolesManagerHandler("EditRoles",buttonContainer,manager,logoutContainer));
+        viewbtn.setOnAction(new RolesManagerHandler("ViewRoles",buttonContainer,manager,logoutContainer));
+        formbtn.setOnAction(new RolesManagerHandler("FormRoles",buttonContainer,manager,logoutContainer));
 
 
         Button[] rolesbtn = {createbtn,updatebtn,viewbtn,formbtn};

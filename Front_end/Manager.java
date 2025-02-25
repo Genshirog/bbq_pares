@@ -3,12 +3,9 @@ package Front_end;
 import Back_end.*;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -252,10 +249,10 @@ public class Manager {
         Button Productbtn = new Button("PRODUCTS");
         Button Supplierbtn = new Button("SUPPLIER");
 
-        Employeebtn.setOnAction(new EmployeeHandler("employee",btnContainer,this,logoutContainer));
-        Rolesbtn.setOnAction(new RolesHandler("roles",btnContainer,this,logoutContainer));
-        Productbtn.setOnAction(new ProductHandler("products",btnContainer,this,logoutContainer));
-        Supplierbtn.setOnAction(new SupplierHandler("supplier",btnContainer,this,logoutContainer));
+        Employeebtn.setOnAction(new EmployeeManagerHandler("employee",btnContainer,this,logoutContainer));
+        Rolesbtn.setOnAction(new RolesManagerHandler("roles",btnContainer,this,logoutContainer));
+        Productbtn.setOnAction(new ProductManagerHandler("products",btnContainer,this,logoutContainer));
+        Supplierbtn.setOnAction(new SupplierManagerHandler("supplier",btnContainer,this,logoutContainer));
 
         Employeebtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         Rolesbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
@@ -269,7 +266,7 @@ public class Manager {
         logoutContainer.getStyleClass().add("logout");
 
         Button logout = new Button("LOG OUT");
-        logout.setOnAction(new EmployeeHandler("logout",btnContainer,this,logoutContainer));
+        logout.setOnAction(new EmployeeManagerHandler("logout",btnContainer,this,logoutContainer));
         logout.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         logoutContainer.getChildren().add(logout);
         return logoutContainer;
@@ -278,7 +275,7 @@ public class Manager {
     public void showLogoutButton() {
         logoutContainer.getChildren().clear();
         Button logout = new Button("LOG OUT");
-        logout.setOnAction(new EmployeeHandler("logout", btnContainer, this, logoutContainer));
+        logout.setOnAction(new EmployeeManagerHandler("logout", btnContainer, this, logoutContainer));
         logout.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
         logoutContainer.getChildren().add(logout);
     }
@@ -287,7 +284,7 @@ public class Manager {
         logoutContainer.getChildren().clear();
         Button back = new Button("Back");
         back.getStyleClass().addAll("btn-1", "border-radius", "background-radius-1");
-        back.setOnAction(new EmployeeHandler("Back", btnContainer, this, logoutContainer));
+        back.setOnAction(new EmployeeManagerHandler("Back", btnContainer, this, logoutContainer));
         logoutContainer.getChildren().add(back);
     }
 

@@ -3,48 +3,45 @@ package Back_end;
 import Front_end.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
-import java.sql.Ref;
-
-public class EmployeeHandler implements EventHandler<ActionEvent> {
+public class ProductManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Manager manager;
     private Refreshable refreshable;
-    public EmployeeHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+    public ProductManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable= new Employee(buttonContainer, manager, logoutContainer);
+        this.refreshable= new ProductManager(buttonContainer, manager, logoutContainer);
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "employee":
+            case "products":
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
                 manager.showBackButton();
                 break;
-            case "AddEmp":
+            case "AddProd":
                 System.out.println("Nigga");
                 break;
-            case "SearchEmp":
+            case "SearchProd":
                 System.out.println("Nigga2");
                 break;
-            case "EditEmp":
+            case "EditProd":
                 System.out.println("Nigga3");
                 break;
-            case "RemEmp":
+            case "RemProd":
                 System.out.println("Nigga4");
                 break;
-            case "ViewEmp":
+            case "ViewProd":
                 refreshable.view_btn();
                 manager.updateComboHolder(refreshable.getCombo());
-                manager.showEmployeeTable();
+                manager.showProductTable();
                 break;
-            case "FormEmp":
+            case "FormProd":
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
@@ -52,7 +49,7 @@ public class EmployeeHandler implements EventHandler<ActionEvent> {
             case "Back":
                 manager.originalComboHolder();
                 manager.buttonContainer();
-                manager.showEmployeeTable();
+                manager.showProductTable();
                 manager.showLogoutButton();
                 break;
             default:

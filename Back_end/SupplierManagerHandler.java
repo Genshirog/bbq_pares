@@ -3,19 +3,16 @@ package Back_end;
 import Front_end.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.scene.control.Button;
 import javafx.scene.layout.VBox;
 
-import java.sql.Ref;
-
-public class SupplierHandler implements EventHandler<ActionEvent> {
+public class SupplierManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Manager manager;
     private Refreshable refreshable;
-    public SupplierHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+    public SupplierManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable= new Supplier(buttonContainer, manager, logoutContainer);
+        this.refreshable= new SupplierManager(buttonContainer, manager, logoutContainer);
     }
 
     @Override
