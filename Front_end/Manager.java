@@ -184,6 +184,32 @@ public class Manager {
         }
     }
 
+    public void showProductTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createProductTable());
+        }
+    }
+
+    public void showSupplierTable() {
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createSupplierTable());
+        }
+    }
+
     private VBox logo_container(){
         VBox logo_container = new VBox();
         logo_container.getStyleClass().add("container-sm");
@@ -228,8 +254,8 @@ public class Manager {
 
         Employeebtn.setOnAction(new EmployeeHandler("employee",btnContainer,this,logoutContainer));
         Rolesbtn.setOnAction(new RolesHandler("roles",btnContainer,this,logoutContainer));
-        Productbtn.setOnAction(new EmployeeHandler("products",btnContainer,this,logoutContainer));
-        Supplierbtn.setOnAction(new EmployeeHandler("supplier",btnContainer,this,logoutContainer));
+        Productbtn.setOnAction(new ProductHandler("products",btnContainer,this,logoutContainer));
+        Supplierbtn.setOnAction(new SupplierHandler("supplier",btnContainer,this,logoutContainer));
 
         Employeebtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         Rolesbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");

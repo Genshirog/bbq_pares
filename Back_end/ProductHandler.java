@@ -1,0 +1,65 @@
+package Back_end;
+
+import Front_end.*;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.scene.control.Button;
+import javafx.scene.layout.VBox;
+
+import java.sql.Ref;
+
+public class ProductHandler implements EventHandler<ActionEvent> {
+    private final String btn;
+    private Manager manager;
+    private Refreshable refreshable;
+    public ProductHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+        this.btn = btn;
+        this.manager = manager;
+        this.refreshable= new Product(buttonContainer, manager, logoutContainer);
+    }
+
+    @Override
+    public void handle(ActionEvent event){
+        switch (btn){
+            case "products":
+                refreshable.form_btn();
+                manager.clearComboHolder();
+                manager.displayForm(refreshable.getForm());
+                manager.showBackButton();
+                break;
+            case "AddProd":
+                System.out.println("Nigga");
+                break;
+            case "SearchProd":
+                System.out.println("Nigga2");
+                break;
+            case "EditProd":
+                System.out.println("Nigga3");
+                break;
+            case "RemProd":
+                System.out.println("Nigga4");
+                break;
+            case "ViewProd":
+                refreshable.view_btn();
+                manager.updateComboHolder(refreshable.getCombo());
+                manager.showProductTable();
+                break;
+            case "FormProd":
+                refreshable.form_btn();
+                manager.clearComboHolder();
+                manager.displayForm(refreshable.getForm());
+                break;
+            case "Back":
+                manager.originalComboHolder();
+                manager.buttonContainer();
+                manager.showProductTable();
+                manager.showLogoutButton();
+                break;
+            default:
+                System.out.println("Wrong button");
+                break;
+        }
+    }
+
+
+}
