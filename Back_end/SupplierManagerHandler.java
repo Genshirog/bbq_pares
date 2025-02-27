@@ -5,27 +5,38 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import java.util.Map;
+
 public class SupplierManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Manager manager;
     private Refreshable refreshable;
-    public SupplierManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+    private DatabaseHandler database;
+    public SupplierManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer, Refreshable refreshable){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable= new SupplierManager(buttonContainer, manager, logoutContainer);
+        this.refreshable= refreshable;
+        this.database = new DatabaseHandler();
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "supplier":
-                refreshable.form_btn();
-                manager.clearComboHolder();
-                manager.displayForm(refreshable.getForm());
-                manager.showBackButton();
-                break;
             case "AddSup":
-                System.out.println("Nigga");
+                Map<String,String> data = refreshable.getFormData();
+                boolean success = database.addSupplier(
+                        data.get("id"),
+                        data.get("fname"),
+                        data.get("lname"),
+                        data.get("mi"),
+                        data.get("person"),
+                        data.get("mail"),
+                        data.get("num"),
+                        data.get("address")
+                );
+                if(success){
+                    refreshable.clearForm();
+                }
                 break;
             case "SearchSup":
                 System.out.println("Nigga2");
@@ -45,12 +56,6 @@ public class SupplierManagerHandler implements EventHandler<ActionEvent> {
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
-                break;
-            case "Back":
-                manager.originalComboHolder();
-                manager.buttonContainer();
-                manager.showSupplierTable();
-                manager.showLogoutButton();
                 break;
             default:
                 System.out.println("Wrong button");

@@ -5,27 +5,35 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import java.util.Map;
+
 public class RolesManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;;
     private final Manager manager;
     private final Refreshable refreshable;
-    public RolesManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+    private final DatabaseHandler database;
+    public RolesManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer, Refreshable refreshable){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable = new RolesManager(buttonContainer,manager,logoutContainer);
+        this.refreshable = refreshable;
+        this.database = new DatabaseHandler();
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "roles":
-                refreshable.form_btn();
-                manager.clearComboHolder();
-                manager.displayForm(refreshable.getForm());
-                manager.showBackButton();
-                break;
             case "AddRoles":
-                System.out.println("Nigga");
+                Map<String,String> data = refreshable.getFormData();
+                boolean success = database.addRoles(
+                        data.get("id"),
+                        data.get("role"),
+                        data.get("description"),
+                        data.get("shift")
+                );
+
+                if(success){
+                    refreshable.clearForm();
+                }
                 break;
             case "SearchRoles":
                 System.out.println("Nigga2");
@@ -45,12 +53,6 @@ public class RolesManagerHandler implements EventHandler<ActionEvent> {
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
-                break;
-            case "Back":
-                manager.originalComboHolder();
-                manager.buttonContainer();
-                manager.showEmployeeTable();
-                manager.showLogoutButton();
                 break;
             default:
                 System.out.println("Wrong button");

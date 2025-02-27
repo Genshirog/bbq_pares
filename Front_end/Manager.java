@@ -249,10 +249,10 @@ public class Manager {
         Button Productbtn = new Button("PRODUCTS");
         Button Supplierbtn = new Button("SUPPLIER");
 
-        Employeebtn.setOnAction(new EmployeeManagerHandler("employee",btnContainer,this,logoutContainer));
-        Rolesbtn.setOnAction(new RolesManagerHandler("roles",btnContainer,this,logoutContainer));
-        Productbtn.setOnAction(new ProductManagerHandler("products",btnContainer,this,logoutContainer));
-        Supplierbtn.setOnAction(new SupplierManagerHandler("supplier",btnContainer,this,logoutContainer));
+        Employeebtn.setOnAction(new ManagerHandler("employee",btnContainer,this,logoutContainer));
+        Rolesbtn.setOnAction(new ManagerHandler("roles",btnContainer,this,logoutContainer));
+        Productbtn.setOnAction(new ManagerHandler("products",btnContainer,this,logoutContainer));
+        Supplierbtn.setOnAction(new ManagerHandler("supplier",btnContainer,this,logoutContainer));
 
         Employeebtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         Rolesbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
@@ -284,7 +284,7 @@ public class Manager {
         logoutContainer.getChildren().clear();
         Button back = new Button("Back");
         back.getStyleClass().addAll("btn-1", "border-radius", "background-radius-1");
-        back.setOnAction(new LogoutHandler(scene));
+        back.setOnAction(new ManagerHandler("Back",btnContainer,this,logoutContainer));
         logoutContainer.getChildren().add(back);
     }
 

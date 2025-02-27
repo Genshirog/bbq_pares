@@ -9,6 +9,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import java.util.Map;
+
 public class SupplierInventory implements Refreshable {
     private final VBox buttonContainer;
     private final Inventory inventory;
@@ -128,5 +130,14 @@ public class SupplierInventory implements Refreshable {
     @Override
     public ComboBox<String> getCombo(){
         return supplierCombo();
+    }
+
+    @Override
+    public Map<String,String> getFormData(){
+        return null;
+    }
+
+    @Override
+    public void clearForm() {
     }
 }

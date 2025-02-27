@@ -5,15 +5,28 @@ import Back_end.SupplierManagerHandler;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import org.w3c.dom.Text;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class SupplierManager implements Refreshable {
     private final VBox buttonContainer;
     private final Manager manager;
     private final VBox logoutContainer;
+    private TextField supID;
+    private TextField supFname;
+    private TextField supLname;
+    private TextField supMI;
+    private TextField supPerson;
+    private TextField supMail;
+    private TextField supNum;
+    private TextField supAdd;
     public SupplierManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
         this.logoutContainer = logoutContainer;
+        initFormFields();
     }
 
     @Override
@@ -24,10 +37,10 @@ public class SupplierManager implements Refreshable {
         Button viewbtn = new Button("View Supplier");
         Button formbtn = new Button("Reset Form");
 
-        searchbtn.setOnAction(new SupplierManagerHandler("SearchSup",buttonContainer,manager,logoutContainer));
-        deletebtn.setOnAction(new SupplierManagerHandler("RemSup",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new SupplierManagerHandler("ViewSup",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new SupplierManagerHandler("FormSup",buttonContainer,manager,logoutContainer));
+        searchbtn.setOnAction(new SupplierManagerHandler("SearchSup",buttonContainer,manager,logoutContainer,this));
+        deletebtn.setOnAction(new SupplierManagerHandler("RemSup",buttonContainer,manager,logoutContainer,this));
+        viewbtn.setOnAction(new SupplierManagerHandler("ViewSup",buttonContainer,manager,logoutContainer,this));
+        formbtn.setOnAction(new SupplierManagerHandler("FormSup",buttonContainer,manager,logoutContainer,this));
 
 
         Button[] supplierbtns = {searchbtn,deletebtn,viewbtn,formbtn};
@@ -38,6 +51,23 @@ public class SupplierManager implements Refreshable {
         buttonContainer.getChildren().addAll(searchbtn,deletebtn,viewbtn,formbtn);
     }
 
+    private void initFormFields(){
+        this.supID = new TextField();
+        this.supFname = new TextField();
+        this.supLname = new TextField();
+        this.supMI = new TextField();
+        this.supPerson = new TextField();
+        this.supMail = new TextField();
+        this.supNum = new TextField();
+        this.supAdd = new TextField();
+
+        // Add styles to all fields
+        TextField[] texts = {supID,supFname,supLname,supMI,supPerson,supMail,supNum,supAdd};
+        for (TextField text : texts) {
+            text.getStyleClass().addAll("textfield-1", "border-radius", "background-radius");
+        }
+    }
+
     @Override
     public void form_btn(){
         buttonContainer.getChildren().clear();
@@ -46,10 +76,10 @@ public class SupplierManager implements Refreshable {
         Button viewbtn = new Button("View Supplier");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new SupplierManagerHandler("AddSup",buttonContainer,manager,logoutContainer));
-        updatebtn.setOnAction(new SupplierManagerHandler("EditSup",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new SupplierManagerHandler("ViewSup",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new SupplierManagerHandler("FormSup",buttonContainer,manager,logoutContainer));
+        createbtn.setOnAction(new SupplierManagerHandler("AddSup",buttonContainer,manager,logoutContainer,this));
+        updatebtn.setOnAction(new SupplierManagerHandler("EditSup",buttonContainer,manager,logoutContainer,this));
+        viewbtn.setOnAction(new SupplierManagerHandler("ViewSup",buttonContainer,manager,logoutContainer,this));
+        formbtn.setOnAction(new SupplierManagerHandler("FormSup",buttonContainer,manager,logoutContainer,this));
 
 
         Button[] supplierbtns = {createbtn,updatebtn,viewbtn,formbtn};
@@ -67,42 +97,39 @@ public class SupplierManager implements Refreshable {
         form.setHgap(20);
 
         Label id = new Label("Supplier ID");
-        TextField supID = new TextField();
         form.add(id,0,0);
         form.add(supID,1,0);
 
         Label fname = new Label("First Name");
-        TextField supFname = new TextField();
         form.add(fname,2,0);
         form.add(supFname,3,0);
 
         Label lname = new Label("Last Name");
-        TextField supLname = new TextField();
         form.add(lname,0,1);
         form.add(supLname,1,1);
 
         Label Minitial = new Label("Middle Initial");
-        TextField supMI = new TextField();
         form.add(Minitial,2,1);
         form.add(supMI,3,1);
 
         Label contactperson = new Label("Contact Person");
-        TextField supPerson = new TextField();
         form.add(contactperson,0,2);
         form.add(supPerson,1,2);
 
         Label email = new Label("Email");
-        TextField supMail = new TextField();
         form.add(email,2,2);
         form.add(supMail,3,2);
 
         Label phoneNum = new Label("Phone Number");
-        TextField supNum = new TextField();
         form.add(phoneNum,0,3);
         form.add(supNum,1,3);
 
-        TextField[] texts = {supID,supFname,supMI,supPerson,supLname,supNum,supMail};
-        Label[] labels = {id,fname,lname,Minitial, contactperson, email,phoneNum};
+        Label address = new Label("Address");
+        form.add(address,2,3);
+        form.add(supAdd,3,3);
+
+        TextField[] texts = {supID,supFname,supMI,supPerson,supLname,supNum,supMail,supAdd};
+        Label[] labels = {id,fname,lname,Minitial, contactperson, email,phoneNum,address};
         for(TextField text : texts){
             text.getStyleClass().addAll("textfield-1","border-radius","background-radius");
         }
@@ -129,5 +156,31 @@ public class SupplierManager implements Refreshable {
     @Override
     public ComboBox<String> getCombo(){
         return supplierCombo();
+    }
+
+    @Override
+    public Map<String,String> getFormData(){
+        Map<String,String> data = new HashMap<>();
+        data.put("id",supID.getText());
+        data.put("fname",supFname.getText());
+        data.put("lname",supLname.getText());
+        data.put("mi",supMI.getText());
+        data.put("person",supPerson.getText());
+        data.put("mail",supMail.getText());
+        data.put("num",supNum.getText());
+        data.put("address",supAdd.getText());
+        return data;
+    }
+
+    @Override
+    public void clearForm() {
+        supID.clear();
+        supFname.clear();
+        supLname.clear();
+        supMI.clear();
+        supPerson.clear();
+        supMail.clear();
+        supNum.clear();
+        supAdd.clear();
     }
 }

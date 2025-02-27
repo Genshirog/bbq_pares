@@ -5,27 +5,39 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import java.util.Map;
+
 public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Manager manager;
     private Refreshable refreshable;
-    public EmployeeManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer){
+    private final DatabaseHandler database;
+    public EmployeeManagerHandler(String btn, VBox buttonContainer, Manager manager, VBox logoutContainer, Refreshable refreshable){
         this.btn = btn;
         this.manager = manager;
-        this.refreshable= new EmployeeManager(buttonContainer, manager, logoutContainer);
+        this.refreshable= refreshable;
+        this.database = new DatabaseHandler();
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "employee":
-                refreshable.form_btn();
-                manager.clearComboHolder();
-                manager.displayForm(refreshable.getForm());
-                manager.showBackButton();
-                break;
             case "AddEmp":
-                System.out.println("Nigga");
+                Map<String,String> data = refreshable.getFormData();
+                boolean success = database.addEmployee(
+                        data.get("id"),
+                        data.get("firstName"),
+                        data.get("lastName"),
+                        data.get("middleInitial"),
+                        data.get("role"),
+                        data.get("email"),
+                        data.get("phoneNumber"),
+                        data.get("password")
+                );
+
+                if(success){
+                    refreshable.clearForm();
+                }
                 break;
             case "SearchEmp":
                 System.out.println("Nigga2");
@@ -45,12 +57,6 @@ public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
                 refreshable.form_btn();
                 manager.clearComboHolder();
                 manager.displayForm(refreshable.getForm());
-                break;
-            case "Back":
-                manager.originalComboHolder();
-                manager.buttonContainer();
-                manager.showEmployeeTable();
-                manager.showLogoutButton();
                 break;
             default:
                 System.out.println("Wrong button");

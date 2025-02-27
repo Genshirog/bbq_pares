@@ -6,14 +6,22 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class RolesManager implements Refreshable {
     private final VBox buttonContainer;
     private final Manager manager;
     private final VBox logoutContainer;
+    private TextField roleID;
+    private TextField roleName;
+    private TextField descriptionText;
+    private TextField shiftText;
     public RolesManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
         this.logoutContainer = logoutContainer;
+        initFormFields();
     }
 
     @Override
@@ -24,10 +32,10 @@ public class RolesManager implements Refreshable {
         Button viewbtn = new Button("View Roles");
         Button formbtn = new Button("Reset Form");
 
-        searchbtn.setOnAction(new RolesManagerHandler("SearchRoles",buttonContainer,manager,logoutContainer));
-        deletebtn.setOnAction(new RolesManagerHandler("RemRoles",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new RolesManagerHandler("ViewRoles",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new RolesManagerHandler("FormRoles",buttonContainer,manager,logoutContainer));
+        searchbtn.setOnAction(new RolesManagerHandler("SearchRoles",buttonContainer,manager,logoutContainer,this));
+        deletebtn.setOnAction(new RolesManagerHandler("RemRoles",buttonContainer,manager,logoutContainer,this));
+        viewbtn.setOnAction(new RolesManagerHandler("ViewRoles",buttonContainer,manager,logoutContainer,this));
+        formbtn.setOnAction(new RolesManagerHandler("FormRoles",buttonContainer,manager,logoutContainer,this));
 
 
         Button[] rolesbtn = {searchbtn,deletebtn,viewbtn,formbtn};
@@ -46,10 +54,10 @@ public class RolesManager implements Refreshable {
         Button viewbtn = new Button("View Roles");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new RolesManagerHandler("AddRoles",buttonContainer,manager,logoutContainer));
-        updatebtn.setOnAction(new RolesManagerHandler("EditRoles",buttonContainer,manager,logoutContainer));
-        viewbtn.setOnAction(new RolesManagerHandler("ViewRoles",buttonContainer,manager,logoutContainer));
-        formbtn.setOnAction(new RolesManagerHandler("FormRoles",buttonContainer,manager,logoutContainer));
+        createbtn.setOnAction(new RolesManagerHandler("AddRoles",buttonContainer,manager,logoutContainer,this));
+        updatebtn.setOnAction(new RolesManagerHandler("EditRoles",buttonContainer,manager,logoutContainer,this));
+        viewbtn.setOnAction(new RolesManagerHandler("ViewRoles",buttonContainer,manager,logoutContainer,this));
+        formbtn.setOnAction(new RolesManagerHandler("FormRoles",buttonContainer,manager,logoutContainer,this));
 
 
         Button[] rolesbtn = {createbtn,updatebtn,viewbtn,formbtn};
@@ -60,6 +68,19 @@ public class RolesManager implements Refreshable {
         buttonContainer.getChildren().addAll(createbtn,updatebtn,viewbtn,formbtn);
     }
 
+    private void initFormFields(){
+        this.roleID = new TextField();
+        this.roleName = new TextField();
+        this.descriptionText = new TextField();
+        this.shiftText = new TextField();
+
+        // Add styles to all fields
+        TextField[] texts = {roleID,roleName,descriptionText,shiftText};
+        for (TextField text : texts) {
+            text.getStyleClass().addAll("textfield-1", "border-radius", "background-radius");
+        }
+    }
+
     private GridPane formHolder(){
         GridPane form = new GridPane();
         form.getStyleClass().add("form");
@@ -67,26 +88,22 @@ public class RolesManager implements Refreshable {
         form.setHgap(20);
 
         Label id = new Label("Role ID");
-        TextField empID = new TextField();
         form.add(id,0,0);
-        form.add(empID,1,0);
+        form.add(roleID,1,0);
 
         Label role = new Label("Role Name");
-        TextField roleName = new TextField();
         form.add(role,2,0);
         form.add(roleName,3,0);
 
         Label description = new Label("Description");
-        TextField descriptionText = new TextField();
         form.add(description,0,1);
         form.add(descriptionText,1,1);
 
         Label shift = new Label("Shift(Day/Night/Full-Time)");
-        TextField shiftText = new TextField();
         form.add(shift,2,1);
         form.add(shiftText,3,1);
 
-        TextField[] texts = {empID,roleName,shiftText,descriptionText};
+        TextField[] texts = {roleID,roleName,shiftText,descriptionText};
         Label[] labels = {id,role,description,shift};
         for(TextField text : texts){
             text.getStyleClass().addAll("textfield-1","border-radius","background-radius");
@@ -114,5 +131,23 @@ public class RolesManager implements Refreshable {
     @Override
     public ComboBox<String> getCombo(){
         return rolesCombo();
+    }
+
+    @Override
+    public Map<String,String> getFormData(){
+        Map<String, String> data = new HashMap<>();
+        data.put("id", roleID.getText());
+        data.put("role", roleName.getText());
+        data.put("description", descriptionText.getText());
+        data.put("shift", shiftText.getText());
+        return data;
+    }
+
+    @Override
+    public void clearForm() {
+        roleID.clear();
+        roleName.clear();
+        descriptionText.clear();
+        shiftText.clear();
     }
 }
