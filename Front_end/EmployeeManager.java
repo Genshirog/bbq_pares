@@ -22,6 +22,7 @@ public class EmployeeManager implements Refreshable {
     private TextField empMail;
     private TextField empNum;
     private PasswordField empPass;
+    private ComboBox<String> views;
     public EmployeeManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
@@ -140,11 +141,16 @@ public class EmployeeManager implements Refreshable {
     }
 
     private ComboBox<String> employeeCombo(){
-        ComboBox<String> views = new ComboBox<>();
+        views = new ComboBox<>();
         views.getItems().addAll("Employee ID", "EmployeeName", "Role");
         views.setValue("Employee ID");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         return views;
+    }
+
+    @Override
+    public String getValue(){
+        return  views.getValue();
     }
 
     @Override

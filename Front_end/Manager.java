@@ -15,6 +15,9 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import javax.xml.crypto.Data;
+import java.util.List;
+
 public class Manager {
     private StackPane root;
     private SceneManager scene;
@@ -23,6 +26,7 @@ public class Manager {
     private VBox logoutContainer;
     private HBox comboHolder;
     private TableManager tableManager;
+    private TextField input;
     public Manager(SceneManager scene){
         this.scene = scene;
         this.btnContainer = new VBox(10);
@@ -98,10 +102,12 @@ public class Manager {
 
     public void updateComboHolder(ComboBox<String> combo){
         comboHolder.getChildren().clear();
-        TextField input = new TextField();
+        input = new TextField();
         input.getStyleClass().addAll("textfield-2","border-radius","background-radius");
         comboHolder.getChildren().addAll(combo,input);
     }
+
+    public String getInput(){return input.getText();}
 
     public void clearComboHolder(){
         comboHolder.getChildren().clear();
@@ -131,8 +137,10 @@ public class Manager {
 
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
+            DatabaseHandler db = new DatabaseHandler();
+            List<EmployeeViews> employees = db.getEmployeeView();
             if("Employee View".equals(selectedView)){
-                tableHolder.getChildren().add(tableManager.createEmployeeTable());
+                tableHolder.getChildren().add(tableManager.createEmployeeTable(employees));
             }else if("Inventory View".equals(selectedView)){
                 tableHolder.getChildren().add(tableManager.createInventoryTable());
             }else if("Menu".equals(selectedView)){
@@ -140,6 +148,19 @@ public class Manager {
             }else{
                 System.out.println("Does not exist");
             }
+        }
+    }
+
+    public void updateEmployeeTable(List<EmployeeViews> employees){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+                tableHolder.getChildren().add(tableManager.createEmployeeTable(employees));
         }
     }
 
@@ -164,7 +185,9 @@ public class Manager {
 
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createEmployeeTable());
+            DatabaseHandler dbHandler = new DatabaseHandler();
+            List<EmployeeViews> employees = dbHandler.getEmployeeView();
+            tableHolder.getChildren().add(tableManager.createEmployeeTable(employees));
         }
     }
 

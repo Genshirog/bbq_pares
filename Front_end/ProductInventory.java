@@ -16,6 +16,7 @@ public class ProductInventory implements Refreshable {
     private final VBox buttonContainer;
     private final Inventory inventory;
     private final VBox logoutContainer;
+    private ComboBox<String> views;
     public ProductInventory(VBox buttonContainer, Inventory inventory, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.inventory = inventory;
@@ -96,12 +97,15 @@ public class ProductInventory implements Refreshable {
     }
 
     private ComboBox<String> supplierCombo(){
-        ComboBox<String> views = new ComboBox<>();
+        views = new ComboBox<>();
         views.getItems().addAll("Product ID", "Product Name", "Supplier");
         views.setValue("Product ID");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         return views;
     }
+
+    @Override
+    public String getValue(){return views.getValue();}
 
     @Override
     public ComboBox<String> getCombo(){

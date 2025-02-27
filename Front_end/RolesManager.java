@@ -17,6 +17,7 @@ public class RolesManager implements Refreshable {
     private TextField roleName;
     private TextField descriptionText;
     private TextField shiftText;
+    private ComboBox<String> views;
     public RolesManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
@@ -121,12 +122,15 @@ public class RolesManager implements Refreshable {
     }
 
     private ComboBox<String> rolesCombo(){
-        ComboBox<String> views = new ComboBox<>();
+        views = new ComboBox<>();
         views.getItems().addAll("Role ID", "Role", "Shift");
         views.setValue("Role ID");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         return views;
     }
+
+    @Override
+    public String getValue(){return views.getValue();}
 
     @Override
     public ComboBox<String> getCombo(){

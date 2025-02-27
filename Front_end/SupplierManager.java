@@ -22,6 +22,7 @@ public class SupplierManager implements Refreshable {
     private TextField supMail;
     private TextField supNum;
     private TextField supAdd;
+    private ComboBox<String> views;
     public SupplierManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
@@ -146,13 +147,15 @@ public class SupplierManager implements Refreshable {
     }
 
     private ComboBox<String> supplierCombo(){
-        ComboBox<String> views = new ComboBox<>();
+        views = new ComboBox<>();
         views.getItems().addAll("Supplier ID", "Supplier Name", "Contact");
         views.setValue("Supplier ID");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         return views;
     }
 
+    @Override
+    public String getValue(){return views.getValue();}
     @Override
     public ComboBox<String> getCombo(){
         return supplierCombo();

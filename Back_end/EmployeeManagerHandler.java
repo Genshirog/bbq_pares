@@ -40,13 +40,29 @@ public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
                 }
                 break;
             case "SearchEmp":
-                System.out.println("Nigga2");
+                manager.updateEmployeeTable(database.searchEmployeeView(manager.getInput(),refreshable.getValue()));
                 break;
             case "EditEmp":
-                System.out.println("Nigga3");
+                Map<String,String> Editdata = refreshable.getFormData();
+                boolean Editsuccess = database.updateEmployee(
+                        Editdata.get("id"),
+                        Editdata.get("firstName"),
+                        Editdata.get("lastName"),
+                        Editdata.get("middleInitial"),
+                        Editdata.get("role"),
+                        Editdata.get("email"),
+                        Editdata.get("phoneNumber"),
+                        Editdata.get("password")
+                );
+                if(Editsuccess){
+                    refreshable.clearForm();
+                }
                 break;
             case "RemEmp":
-                System.out.println("Nigga4");
+                boolean deleteSuccess = database.deleteEmployee(manager.getInput(),refreshable.getValue());
+                if (deleteSuccess){
+                    manager.showEmployeeTable();
+                }
                 break;
             case "ViewEmp":
                 refreshable.view_btn();

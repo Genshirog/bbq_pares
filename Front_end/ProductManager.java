@@ -18,6 +18,7 @@ public class ProductManager implements Refreshable {
     private TextField priceText;
     private TextField cost_text;
     private TextField supplierText;
+    private ComboBox<String> views;
     public ProductManager(VBox buttonContainer, Manager manager, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.manager = manager;
@@ -127,12 +128,15 @@ public class ProductManager implements Refreshable {
     }
 
     private ComboBox<String> supplierCombo(){
-        ComboBox<String> views = new ComboBox<>();
+        views = new ComboBox<>();
         views.getItems().addAll("Product ID", "Product Name", "Supplier");
         views.setValue("Product ID");
         views.getStyleClass().addAll("border-radius", "background-radius", "manager-combo", "fs-1");
         return views;
     }
+
+    @Override
+    public String getValue(){return views.getValue();}
 
     @Override
     public ComboBox<String> getCombo(){

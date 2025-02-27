@@ -10,17 +10,18 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 
+import java.util.List;
+
 public class TableManager {
     TableManager(){
 
     }
 
-    public VBox createEmployeeTable() {
+    public VBox createEmployeeTable(List<EmployeeViews> employees) {
         TableView<EmployeeViews> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
         TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("EmployeeID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("employeeId"));
-        idColumn.setMaxWidth(250);
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("employeeID"));
         idColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> nameColumn = new TableColumn<>("Employee Name");
@@ -28,17 +29,15 @@ public class TableManager {
         nameColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> roleColumn = new TableColumn<>("Role");
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        roleColumn.setMaxWidth(100);
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("employeeRole"));
         roleColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
-        emailColumn.setMaxWidth(100);
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("employeeEmail"));
         emailColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> phoneColumn = new TableColumn<>("Phone Number");
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNumber"));
+        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("number"));
         phoneColumn.setReorderable(false);
 
         TableColumn<EmployeeViews, String> password = new TableColumn<>("Password");
@@ -57,7 +56,7 @@ public class TableManager {
 
         VBox.setVgrow(table,Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
-
+        table.getItems().addAll(employees);
         return new VBox(scrollPane);
     }
 

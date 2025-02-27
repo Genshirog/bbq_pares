@@ -11,4 +11,5 @@ public interface Refreshable {
     public ComboBox<String> getCombo();
     public Map<String, String> getFormData();
     public void clearForm();
+    public String getValue();
 }
