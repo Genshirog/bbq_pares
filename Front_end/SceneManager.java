@@ -68,46 +68,6 @@ public class SceneManager {
         }
     }
 
-    public void show_main_cashier(){
-        Cashier cashier = new Cashier(this);
-        cashier.getRoot().setOpacity(0);
-        Scene app_scene = cashier.getScene();
-        if (currentRoot != null) {
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(800), currentRoot);
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
-
-            fadeOut.setOnFinished(e -> {
-                stage.setScene(app_scene);
-                stage.setResizable(true);
-                stage.setMaximized(false);
-                stage.setMaximized(true);
-                stage.setResizable(false);
-
-                FadeTransition fadeIn = new FadeTransition(Duration.millis(800), cashier.getRoot());
-                fadeIn.setFromValue(0.0);
-                fadeIn.setToValue(1.0);
-                fadeIn.play();
-
-                currentRoot = cashier.getRoot();
-            });
-
-            fadeOut.play();
-        } else {
-            stage.setScene(app_scene);
-            stage.setResizable(true);
-            stage.setMaximized(false);
-            stage.setMaximized(true);
-            stage.setResizable(false);
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(800), cashier.getRoot());
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
-            fadeIn.play();
-
-            currentRoot = cashier.getRoot();
-        }
-    }
-
     public void show_main_inventory(){
         Inventory inventory = new Inventory(this);
         inventory.getRoot().setOpacity(0);

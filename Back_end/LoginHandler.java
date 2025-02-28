@@ -29,7 +29,7 @@ public class LoginHandler implements EventHandler<ActionEvent> {
             this.scene.show_main_manager();
             this.errormsg.setVisible(false);
         }else if(username.equals("Dog") && password.equals("Cat") && role.equals("Cashier")){
-            this.scene.show_main_cashier();
+            this.scene.show_main_cashierorder();
             this.errormsg.setVisible(false);
         }else if(username.equals("Dog") && password.equals("Cat") && role.equals("Inventory Clerk")){
             this.scene.show_main_inventory();
