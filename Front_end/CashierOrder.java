@@ -265,12 +265,13 @@ public class CashierOrder {
         Button resetBtn = new Button("RESET ORDER");
         Button removeBtn = new Button("REMOVE ORDER");
         Button cancelBtn = new Button("CANCEL ORDER");
-
+        Button backBtn = new Button("BACK");
         // Add styles
         confirmBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
         resetBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
         removeBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
         cancelBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
+        backBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
 
         // Add button actionS
         removeBtn.setOnAction(e -> {
@@ -308,7 +309,7 @@ public class CashierOrder {
             selectedOrderItem = null;
         });
 
-        buttonContainer.getChildren().addAll(confirmBtn, resetBtn, removeBtn, cancelBtn);
+        buttonContainer.getChildren().addAll(confirmBtn, resetBtn, removeBtn, cancelBtn, backBtn);
         return buttonContainer;
     }
 

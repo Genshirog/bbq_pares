@@ -413,6 +413,8 @@
     -fx-faint-focus-color: transparent;
 }
 
+/*THE ORDERING STYLE*/
+
 .container-order-logo{
     -fx-pref-height: 150px;
     -fx-max-height: 150px;
