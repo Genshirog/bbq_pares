@@ -1,9 +1,6 @@
 package Front_end;
 
-import Back_end.EmployeeViews;
-import Back_end.InventoryViews;
-import Back_end.MenuViews;
-import Back_end.RoleView;
+import Back_end.*;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -181,30 +178,27 @@ public class TableManager {
         return new VBox(scrollPane);
     }
 
-    public VBox createProductTable() {
-        TableView<EmployeeViews> table = new TableView<>();
+    public VBox createProductTable(List<ProductView> products) {
+        TableView<ProductView> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("Product ID");
+        TableColumn<ProductView, String> idColumn = new TableColumn<>("Product ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("productID"));
-        idColumn.setMaxWidth(250);
         idColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> prodNameColumn = new TableColumn<>("Product Name");
+        TableColumn<ProductView, String> prodNameColumn = new TableColumn<>("Product Name");
         prodNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
-        prodNameColumn.setMaxWidth(250);
         prodNameColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> priceColumn = new TableColumn<>("Product Price");
-        priceColumn.setCellValueFactory(new PropertyValueFactory<>("prodPrice"));
-        priceColumn.setMaxWidth(250);
+        TableColumn<ProductView, Double> priceColumn = new TableColumn<>("Product Price");
+        priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> costColumn = new TableColumn<>("Product Cost");
-        costColumn.setCellValueFactory(new PropertyValueFactory<>("prodCost"));
+        TableColumn<ProductView, Double> costColumn = new TableColumn<>("Product Cost");
+        costColumn.setCellValueFactory(new PropertyValueFactory<>("cost"));
         costColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> supplierColumn = new TableColumn<>("Product Supplier");
-        supplierColumn.setCellValueFactory(new PropertyValueFactory<>("prodSupplier"));
+        TableColumn<ProductView, String> supplierColumn = new TableColumn<>("Product Supplier");
+        supplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplierID"));
         supplierColumn.setReorderable(false);
 
         table.getColumns().addAll(idColumn,prodNameColumn,priceColumn,costColumn,supplierColumn);
@@ -219,37 +213,39 @@ public class TableManager {
 
         VBox.setVgrow(table,Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
+        table.getItems().addAll(products);
 
         return new VBox(scrollPane);
     }
 
-    public VBox createSupplierTable() {
-        TableView<EmployeeViews> table = new TableView<>();
+    public VBox createSupplierTable(List<SupplierView> suppliers) {
+        TableView<SupplierView> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("Supplier ID");
+        TableColumn<SupplierView, String> idColumn = new TableColumn<>("Supplier ID");
         idColumn.setCellValueFactory(new PropertyValueFactory<>("supplierID"));
-        idColumn.setMaxWidth(250);
         idColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> supNameColumn = new TableColumn<>("Supplier Name");
+        TableColumn<SupplierView, String> supNameColumn = new TableColumn<>("Supplier Name");
         supNameColumn.setCellValueFactory(new PropertyValueFactory<>("supplierName"));
-        supNameColumn.setMaxWidth(250);
         supNameColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> personColumn = new TableColumn<>("Contact Person");
+        TableColumn<SupplierView, String> personColumn = new TableColumn<>("Contact Person");
         personColumn.setCellValueFactory(new PropertyValueFactory<>("person"));
-        personColumn.setMaxWidth(250);
         personColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> emailColumn = new TableColumn<>("Email");
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        TableColumn<SupplierView, String> addressColumn = new TableColumn<>("Address");
+        addressColumn.setCellValueFactory(new PropertyValueFactory<>("address"));
+        addressColumn.setReorderable(false);
+
+        TableColumn<SupplierView, String> emailColumn = new TableColumn<>("Email");
+        emailColumn.setCellValueFactory(new PropertyValueFactory<>("supplierMail"));
         emailColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> phoneColumn = new TableColumn<>("Phone Number");
-        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("phoneNum"));
+        TableColumn<SupplierView, String> phoneColumn = new TableColumn<>("Phone Number");
+        phoneColumn.setCellValueFactory(new PropertyValueFactory<>("supplierNumber"));
         phoneColumn.setReorderable(false);
 
-        table.getColumns().addAll(idColumn,supNameColumn,personColumn,emailColumn,phoneColumn);
+        table.getColumns().addAll(idColumn,supNameColumn,personColumn,addressColumn,emailColumn,phoneColumn);
         table.setTableMenuButtonVisible(false);
 
         VBox.setVgrow(table, Priority.ALWAYS);
@@ -261,7 +257,7 @@ public class TableManager {
 
         VBox.setVgrow(table,Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
-
+        table.getItems().addAll(suppliers);
         return new VBox(scrollPane);
     }
 

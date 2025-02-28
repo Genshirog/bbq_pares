@@ -178,6 +178,32 @@ public class Manager {
         }
     }
 
+    public void updateProductTable(List<ProductView> products){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+                tableHolder.getChildren().add(tableManager.createProductTable(products));
+        }
+    }
+
+    public void updateSupplierTable(List<SupplierView> suppliers){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+                tableHolder.getChildren().add(tableManager.createSupplierTable(suppliers));
+        }
+    }
+
     public void displayForm(GridPane form){
         VBox tableHolder = left_panel.getChildren().stream()
                 .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
@@ -226,9 +252,11 @@ public class Manager {
                 .findFirst()
                 .orElse(null);
 
+        DatabaseHandler db = new DatabaseHandler();
+        List<ProductView> products = db.getProductView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createProductTable());
+            tableHolder.getChildren().add(tableManager.createProductTable(products));
         }
     }
 
@@ -238,10 +266,11 @@ public class Manager {
                 .map(child -> (VBox) child)
                 .findFirst()
                 .orElse(null);
-
+        DatabaseHandler db = new DatabaseHandler();
+        List<SupplierView> suppliers = db.getSupplierView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createSupplierTable());
+            tableHolder.getChildren().add(tableManager.createSupplierTable(suppliers));
         }
     }
 

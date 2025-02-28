@@ -37,13 +37,27 @@ public class ProductManagerHandler implements EventHandler<ActionEvent> {
                 }
                 break;
             case "SearchProd":
-                System.out.println("Nigga2");
+                manager.updateProductTable(database.searchProductView(manager.getInput(),refreshable.getValue()));
                 break;
             case "EditProd":
-                System.out.println("Nigga3");
+                Map<String,String> Editdata = refreshable.getFormData();
+                boolean Editsuccess = database.updateProducts(
+                        Editdata.get("id"),
+                        Editdata.get("name"),
+                        Editdata.get("price"),
+                        Editdata.get("cost"),
+                        Editdata.get("supplier")
+                );
+
+                if(Editsuccess){
+                    refreshable.clearForm();
+                }
                 break;
             case "RemProd":
-                System.out.println("Nigga4");
+                boolean deleteSuccess = database.deleteProducts(manager.getInput(),refreshable.getValue());
+                if (deleteSuccess){
+                    manager.showProductTable();
+                }
                 break;
             case "ViewProd":
                 refreshable.view_btn();

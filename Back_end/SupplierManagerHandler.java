@@ -39,13 +39,29 @@ public class SupplierManagerHandler implements EventHandler<ActionEvent> {
                 }
                 break;
             case "SearchSup":
-                System.out.println("Nigga2");
+                manager.updateSupplierTable(database.searchSupplierView(manager.getInput(),refreshable.getValue()));
                 break;
             case "EditSup":
-                System.out.println("Nigga3");
+                Map<String,String> editdata = refreshable.getFormData();
+                boolean editsuccess = database.updateSupplier(
+                        editdata.get("id"),
+                        editdata.get("fname"),
+                        editdata.get("lname"),
+                        editdata.get("mi"),
+                        editdata.get("person"),
+                        editdata.get("mail"),
+                        editdata.get("num"),
+                        editdata.get("address")
+                );
+                if(editsuccess){
+                    refreshable.clearForm();
+                }
                 break;
             case "RemSup":
-                System.out.println("Nigga4");
+                boolean deleteSuccess = database.deleteSupplier(manager.getInput(),refreshable.getValue());
+                if (deleteSuccess){
+                    manager.showProductTable();
+                }
                 break;
             case "ViewSup":
                 refreshable.view_btn();

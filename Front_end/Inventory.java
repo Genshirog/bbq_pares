@@ -160,7 +160,7 @@ public class Inventory {
 
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createProductTable());
+            //tableHolder.getChildren().add(tableManager.createProductTable());
         }
     }
 
@@ -173,7 +173,7 @@ public class Inventory {
 
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createSupplierTable());
+            //tableHolder.getChildren().add(tableManager.createSupplierTable());
         }
     }
 

@@ -166,6 +166,57 @@ public class DatabaseHandler {
         }
         return roles;
     }
+
+    public List<ProductView> getProductView(){
+        List<ProductView> products = new ArrayList<>();
+        String sql = "SELECT * FROM products";
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                ProductView product = new ProductView(
+                rs.getString("productID"),
+                rs.getString("productName"),
+                rs.getString("price"),
+                rs.getString("cost"),
+                rs.getString("supplierID")
+                );
+                products.add(product);
+            }
+            conn.close();
+        }catch (Exception e){
+            e.getMessage();
+        }
+        return products;
+    }
+
+    public List<SupplierView> getSupplierView(){
+        List<SupplierView> suppliers = new ArrayList<>();
+        String sql = "SELECT * FROM supplier_view";
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                SupplierView supplier = new SupplierView(
+                rs.getString("supplierID"),
+                rs.getString("supplierName"),
+                rs.getString("contact_person"),
+                rs.getString("address"),
+                rs.getString("email"),
+                rs.getString("phone_number")
+                );
+                suppliers.add(supplier);
+            }
+            conn.close();
+        }catch (Exception e){
+            e.getMessage();
+        }
+        return suppliers;
+    }
+
+
     public boolean addRoles(String id, String role, String description, String shift) {
         String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
 
@@ -251,7 +302,7 @@ public class DatabaseHandler {
     }
 
     public boolean addProducts(String id, String name, String price, String cost, String supplier) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
+        String sql = "INSERT INTO products (ProductID, ProductName, Price, Cost, SupplierID) VALUES  (?, ?, ?, ?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -268,34 +319,49 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean searchProducts(String id, String name, String price, String cost, String supplier) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.setString(2, name);
-            pstmt.setString(3, price);
-            pstmt.setString(4, cost);
-            pstmt.setString(5, supplier);
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (Exception e) {
+    public List<ProductView> searchProductView(String id, String value){
+        List<ProductView> roles = new ArrayList<>();
+        String sql = switch (value) {
+            case "Product ID" -> "SELECT * FROM products WHERE ProductID LIKE ?";
+            case "Product Name" -> "SELECT * FROM products WHERE ProductName LIKE ?";
+            case "Supplier ID" -> "SELECT * FROM products WHERE SupplierID LIKE ?";
+            default -> "";
+        };
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            switch (value) {
+                case "Product ID" -> stmt.setString(1, "%" + id + "%");
+                case "Product Name", "Supplier ID" -> stmt.setString(1, id + "%");
+            }
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                ProductView prodView = new ProductView(
+                        rs.getString("productID"),
+                        rs.getString("productName"),
+                        rs.getString("price"),
+                        rs.getString("cost"),
+                        rs.getString("supplierID")
+                );
+                roles.add(prodView);
+            }
+            conn.close();
+        }catch (Exception e){
             System.out.println(e.getMessage());
-            return false;
         }
+        return roles;
     }
 
     public boolean updateProducts(String id, String name, String price, String cost, String supplier) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
+        String sql = "UPDATE products SET productName = ?, price = ?, cost = ?, supplierID = ? WHERE productID = ?";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.setString(2, name);
-            pstmt.setString(3, price);
-            pstmt.setString(4, cost);
-            pstmt.setString(5, supplier);
+            pstmt.setString(1, name);
+            pstmt.setString(2, price);
+            pstmt.setString(3, cost);
+            pstmt.setString(4, supplier);
+            pstmt.setString(5, id);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -304,16 +370,17 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean deleteProducts(String id, String name, String price, String cost, String supplier) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
+    public boolean deleteProducts(String id, String value) {
+        String sql = switch (value) {
+            case "Product ID" -> "DELETE FROM products WHERE productID = ?";
+            case "Product Name" -> "DELETE FROM products WHERE productName = ?";
+            case "Supplier" -> "DELETE FROM products WHERE supplierID = ?";
+            default -> "";
+        };
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            pstmt.setString(2, name);
-            pstmt.setString(3, price);
-            pstmt.setString(4, cost);
-            pstmt.setString(5, supplier);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -343,40 +410,54 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean searchSupplier(String id, String fname, String lname, String mi, String person, String mail, String num, String add) {
-        String sql = "INSERT INTO supplier (supplierID, first_name, last_name, middle_initial,contact_person,phone_number,email,address) VALUES  (?, ?, ?, ?,?,?,?,?)";
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.setString(2, fname);
-            pstmt.setString(3, lname);
-            pstmt.setString(4, mi);
-            pstmt.setString(5, person);
-            pstmt.setString(6, mail);
-            pstmt.setString(7, num);
-            pstmt.setString(8, add);
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (Exception e) {
+    public List<SupplierView> searchSupplierView(String id, String value){
+        List<SupplierView> suppliers = new ArrayList<>();
+        String sql = switch (value) {
+            case "Supplier ID" -> "SELECT * FROM supplier_view WHERE supplierID LIKE ?";
+            case "Supplier Name" -> "SELECT * FROM supplier_view WHERE supplierName LIKE ?";
+            case "Person" -> "SELECT * FROM supplier_view WHERE contact_person LIKE ?";
+            default -> "";
+        };
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            switch (value) {
+                case "Supplier ID" -> stmt.setString(1, "%" + id + "%");
+                case "Supplier Name", "Person" -> stmt.setString(1, id + "%");
+            }
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                SupplierView supplier = new SupplierView(
+                        rs.getString("supplierID"),
+                        rs.getString("supplierName"),
+                        rs.getString("contact_person"),
+                        rs.getString("address"),
+                        rs.getString("email"),
+                        rs.getString("phone_number")
+                );
+                suppliers.add(supplier);
+            }
+            conn.close();
+        }catch (Exception e){
             System.out.println(e.getMessage());
-            return false;
         }
+        return suppliers;
     }
 
     public boolean updateSupplier(String id, String fname, String lname, String mi, String person, String mail, String num, String add) {
-        String sql = "INSERT INTO supplier (supplierID, first_name, last_name, middle_initial,contact_person,phone_number,email,address) VALUES  (?, ?, ?, ?,?,?,?,?)";
+        String sql = " UPDATE supplier SET first_name = ?, last_name = ?, middle_initial = ?, contact_person = ?, phone_number = ?, email = ?, address = ? WHERE supplierID = ?";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.setString(2, fname);
-            pstmt.setString(3, lname);
-            pstmt.setString(4, mi);
-            pstmt.setString(5, person);
+            pstmt.setString(1, fname);
+            pstmt.setString(2, lname);
+            pstmt.setString(3, mi);
+            pstmt.setString(4, person);
+            pstmt.setString(5, add);
             pstmt.setString(6, mail);
             pstmt.setString(7, num);
-            pstmt.setString(8, add);
+            pstmt.setString(8, id);
+
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -385,19 +466,17 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean deleteSupplier(String id, String fname, String lname, String mi, String person, String mail, String num, String add) {
-        String sql = "INSERT INTO supplier (supplierID, first_name, last_name, middle_initial,contact_person,phone_number,email,address) VALUES  (?, ?, ?, ?,?,?,?,?)";
+    public boolean deleteSupplier(String id, String value) {
+        String sql = switch (value) {
+            case "Supplier ID" -> "DELETE FROM supplier WHERE supplierID = ?";
+            case "Supplier Name" -> "DELETE FROM supplier WHERE CONCAT(last_name,', ', first_name,' ',middle_initial,'.') = ?";
+            case "Person" -> "DELETE FROM supplier WHERE contact_person = ?";
+            default -> "";
+        };
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            pstmt.setString(2, fname);
-            pstmt.setString(3, lname);
-            pstmt.setString(4, mi);
-            pstmt.setString(5, person);
-            pstmt.setString(6, mail);
-            pstmt.setString(7, num);
-            pstmt.setString(8, add);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
