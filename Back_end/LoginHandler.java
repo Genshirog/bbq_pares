@@ -1,6 +1,6 @@
 package Back_end;
 
-import Front_end.SceneManager;
+import Front_end.   SceneManager;
 import javafx.animation.TranslateTransition;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
