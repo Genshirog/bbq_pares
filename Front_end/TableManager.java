@@ -58,7 +58,7 @@ public class TableManager {
         return new VBox(scrollPane);
     }
 
-    public VBox createInventoryTable(){
+    public VBox createInventoryTable(List<InventoryViews> inventory){
         TableView<InventoryViews> table = new TableView<>();
 
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
@@ -97,7 +97,7 @@ public class TableManager {
 
         VBox.setVgrow(table,Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
-
+        table.getItems().addAll(inventory);
         return new VBox(scrollPane);
     }
 

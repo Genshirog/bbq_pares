@@ -1,26 +1,27 @@
 package Front_end;
 
 import Back_end.ProductInventoryHandler;
+import Back_end.ProductManagerHandler;
 import Back_end.Refreshable;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
-import org.w3c.dom.Text;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ProductInventory implements Refreshable {
     private final VBox buttonContainer;
     private final Inventory inventory;
     private final VBox logoutContainer;
+    private TextField prodId;
+    private TextField prodQuantity;
     private ComboBox<String> views;
     public ProductInventory(VBox buttonContainer, Inventory inventory, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.inventory = inventory;
         this.logoutContainer = logoutContainer;
+        initFormFields();
     }
 
     @Override
@@ -30,10 +31,9 @@ public class ProductInventory implements Refreshable {
         Button viewbtn = new Button("View Product");
         Button formbtn = new Button("Reset Form");
 
-        searchbtn.setOnAction(new ProductInventoryHandler("SearchProd",buttonContainer,inventory,logoutContainer));
-        viewbtn.setOnAction(new ProductInventoryHandler("ViewProd",buttonContainer,inventory,logoutContainer));
-        formbtn.setOnAction(new ProductInventoryHandler("FormProd",buttonContainer,inventory,logoutContainer));
-
+        searchbtn.setOnAction(new ProductInventoryHandler("SearchProd",buttonContainer,inventory,logoutContainer,this));
+        viewbtn.setOnAction(new ProductInventoryHandler("ViewProd",buttonContainer,inventory,logoutContainer,this));
+        formbtn.setOnAction(new ProductInventoryHandler("FormProd",buttonContainer,inventory,logoutContainer,this));
 
         Button[] employeebtns = {searchbtn,viewbtn,formbtn};
         for(Button button:employeebtns){
@@ -43,16 +43,27 @@ public class ProductInventory implements Refreshable {
         buttonContainer.getChildren().addAll(searchbtn,viewbtn,formbtn);
     }
 
+    private void initFormFields(){
+        this.prodId = new TextField();
+        this.prodQuantity = new TextField();
+
+        // Add styles to all fields
+        TextField[] texts = {prodId,prodQuantity};
+        for (TextField text : texts) {
+            text.getStyleClass().addAll("textfield-1", "border-radius", "background-radius");
+        }
+    }
+
     @Override
     public void form_btn(){
         buttonContainer.getChildren().clear();
-        Button updatebtn = new Button("Stock In");
+        Button updatebtn = new Button("Stock-In");
         Button viewbtn = new Button("View Product");
         Button formbtn = new Button("Reset Form");
 
-        updatebtn.setOnAction(new ProductInventoryHandler("EditProd",buttonContainer,inventory,logoutContainer));
-        viewbtn.setOnAction(new ProductInventoryHandler("ViewProd",buttonContainer,inventory,logoutContainer));
-        formbtn.setOnAction(new ProductInventoryHandler("FormProd",buttonContainer,inventory,logoutContainer));
+        updatebtn.setOnAction(new ProductInventoryHandler("EditProd",buttonContainer,inventory,logoutContainer,this));
+        viewbtn.setOnAction(new ProductInventoryHandler("ViewProd",buttonContainer,inventory,logoutContainer,this));
+        formbtn.setOnAction(new ProductInventoryHandler("FormProd",buttonContainer,inventory,logoutContainer,this));
 
 
         Button[] employeebtns = {updatebtn,viewbtn,formbtn};
@@ -70,17 +81,15 @@ public class ProductInventory implements Refreshable {
         form.setHgap(20);
 
         Label id = new Label("Product ID");
-        TextField empID = new TextField();
         form.add(id,0,0);
-        form.add(empID,1,0);
+        form.add(prodId,1,0);
 
-        Label quantity = new Label("Quantity");
-        TextField quantext = new TextField();
-        form.add(quantity,0,1);
-        form.add(quantext,1,1);
+        Label pname = new Label("Quantity");
+        form.add(pname,0,1);
+        form.add(prodQuantity,1,1);
 
-        TextField[] texts = {empID,quantext};
-        Label[] labels = {id,quantity};
+        TextField[] texts = {prodId,prodQuantity};
+        Label[] labels = {id,pname};
         for(TextField text : texts){
             text.getStyleClass().addAll("textfield-1","border-radius","background-radius");
         }
@@ -114,10 +123,15 @@ public class ProductInventory implements Refreshable {
 
     @Override
     public Map<String,String> getFormData(){
-        return null;
+        Map<String,String> data = new HashMap<>();
+        data.put("id", prodId.getText());
+        data.put("name", prodQuantity.getText());
+        return data;
     }
 
     @Override
     public void clearForm() {
+        prodId.clear();
+        prodQuantity.clear();
     }
 }

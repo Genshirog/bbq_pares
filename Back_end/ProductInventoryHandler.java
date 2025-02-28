@@ -5,36 +5,45 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import java.util.Map;
+
 public class ProductInventoryHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Inventory inventory;
     private Refreshable refreshable;
-    public ProductInventoryHandler(String btn, VBox buttonContainer, Inventory inventory, VBox logoutContainer){
+    private DatabaseHandler database;
+    public ProductInventoryHandler(String btn, VBox buttonContainer, Inventory inventory, VBox logoutContainer, Refreshable refreshable){
         this.btn = btn;
         this.inventory = inventory;
-        this.refreshable= new ProductInventory(buttonContainer, inventory, logoutContainer);
+        this.refreshable= refreshable;
+        this.database = new DatabaseHandler();
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "products":
-                refreshable.form_btn();
-                inventory.clearComboHolder();
-                inventory.displayForm(refreshable.getForm());
-                inventory.showBackButton();
-                break;
-            case "AddProd":
-                System.out.println("Nigga");
-                break;
             case "SearchProd":
-                System.out.println("Nigga2");
+                inventory.updateProductTable(database.searchProductView(inventory.getInput(),refreshable.getValue()));
                 break;
             case "EditProd":
-                System.out.println("Nigga3");
+                Map<String,String> Editdata = refreshable.getFormData();
+                boolean Editsuccess = database.updateProducts(
+                        Editdata.get("id"),
+                        Editdata.get("name"),
+                        Editdata.get("price"),
+                        Editdata.get("cost"),
+                        Editdata.get("supplier")
+                );
+
+                if(Editsuccess){
+                    refreshable.clearForm();
+                }
                 break;
             case "RemProd":
-                System.out.println("Nigga4");
+                boolean deleteSuccess = database.deleteProducts(inventory.getInput(),refreshable.getValue());
+                if (deleteSuccess){
+                    inventory.showProductTable();
+                }
                 break;
             case "ViewProd":
                 refreshable.view_btn();
@@ -49,7 +58,7 @@ public class ProductInventoryHandler implements EventHandler<ActionEvent> {
             case "Back":
                 inventory.originalComboHolder();
                 inventory.buttonContainer();
-                inventory.showInventoryTable();
+                inventory.showProductTable();
                 inventory.showLogoutButton();
                 break;
             default:

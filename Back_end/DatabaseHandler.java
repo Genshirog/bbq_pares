@@ -87,9 +87,9 @@ public class DatabaseHandler {
             pstmt.setString(2, lastName);
             pstmt.setString(3, middleInitial);
             pstmt.setString(4, role);
-            pstmt.setString(5, phoneNumber);
-            pstmt.setString(6, password);
-            pstmt.setString(7, email);
+            pstmt.setString(5, email);
+            pstmt.setString(6, phoneNumber);
+            pstmt.setString(7, password);
             pstmt.setString(8, id);
 
             int rowsAffected = pstmt.executeUpdate();
@@ -142,6 +142,31 @@ public class DatabaseHandler {
             e.getMessage();
         }
         return employees;
+    }
+
+    public List<InventoryViews> getInventoryView(){
+        List<InventoryViews> inventory = new ArrayList<>();
+        String sql = "SELECT * FROM inventory";
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                InventoryViews inventories = new InventoryViews(
+                rs.getString("InventoryID"),
+                rs.getString("ProductID"),
+                rs.getString("SupplierID"),
+                rs.getString("stock_quantity"),
+                rs.getString("stock_date"),
+                rs.getString("availability")
+                );
+                inventory.add(inventories);
+            }
+            conn.close();
+        }catch (Exception e){
+            e.getMessage();
+        }
+        return inventory;
     }
 
     public List<RoleView> getRoleView(){

@@ -2,24 +2,32 @@ package Front_end;
 
 import Back_end.Refreshable;
 import Back_end.SupplierInventoryHandler;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
+import org.w3c.dom.Text;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class SupplierInventory implements Refreshable {
     private final VBox buttonContainer;
     private final Inventory inventory;
     private final VBox logoutContainer;
+    private TextField supID;
+    private TextField supFname;
+    private TextField supLname;
+    private TextField supMI;
+    private TextField supPerson;
+    private TextField supMail;
+    private TextField supNum;
+    private TextField supAdd;
     private ComboBox<String> views;
     public SupplierInventory(VBox buttonContainer, Inventory inventory, VBox logoutContainer){
         this.buttonContainer = buttonContainer;
         this.inventory = inventory;
         this.logoutContainer = logoutContainer;
+        initFormFields();
     }
 
     @Override
@@ -28,8 +36,8 @@ public class SupplierInventory implements Refreshable {
         Button searchbtn = new Button("Search Supplier");
         Button viewbtn = new Button("View Supplier");
 
-        searchbtn.setOnAction(new SupplierInventoryHandler("SearchSup",buttonContainer,inventory,logoutContainer));
-        viewbtn.setOnAction(new SupplierInventoryHandler("ViewSup",buttonContainer,inventory,logoutContainer));
+        searchbtn.setOnAction(new SupplierInventoryHandler("SearchSup",buttonContainer,inventory,logoutContainer,this));
+        viewbtn.setOnAction(new SupplierInventoryHandler("ViewSup",buttonContainer,inventory,logoutContainer,this));
 
 
         Button[] supplierbtns = {searchbtn,viewbtn};
@@ -40,26 +48,39 @@ public class SupplierInventory implements Refreshable {
         buttonContainer.getChildren().addAll(searchbtn,viewbtn);
     }
 
+    private void initFormFields(){
+        this.supID = new TextField();
+        this.supFname = new TextField();
+        this.supLname = new TextField();
+        this.supMI = new TextField();
+        this.supPerson = new TextField();
+        this.supMail = new TextField();
+        this.supNum = new TextField();
+        this.supAdd = new TextField();
+
+        // Add styles to all fields
+        TextField[] texts = {supID,supFname,supLname,supMI,supPerson,supMail,supNum,supAdd};
+        for (TextField text : texts) {
+            text.getStyleClass().addAll("textfield-1", "border-radius", "background-radius");
+        }
+    }
+
     @Override
     public void form_btn(){
         buttonContainer.getChildren().clear();
-        Button createbtn = new Button("Add Supplier");
-        Button updatebtn = new Button("Edit Supplier");
         Button viewbtn = new Button("View Supplier");
         Button formbtn = new Button("Reset Form");
 
-        createbtn.setOnAction(new SupplierInventoryHandler("AddSup",buttonContainer,inventory,logoutContainer));
-        updatebtn.setOnAction(new SupplierInventoryHandler("EditSup",buttonContainer,inventory,logoutContainer));
-        viewbtn.setOnAction(new SupplierInventoryHandler("ViewSup",buttonContainer,inventory,logoutContainer));
-        formbtn.setOnAction(new SupplierInventoryHandler("FormSup",buttonContainer,inventory,logoutContainer));
+        viewbtn.setOnAction(new SupplierInventoryHandler("ViewSup",buttonContainer,inventory,logoutContainer,this));
+        formbtn.setOnAction(new SupplierInventoryHandler("FormSup",buttonContainer,inventory,logoutContainer,this));
 
 
-        Button[] supplierbtns = {createbtn,updatebtn,viewbtn,formbtn};
+        Button[] supplierbtns = {viewbtn,formbtn};
         for(Button button:supplierbtns){
             button.getStyleClass().addAll("btn-1","border-radius","background-radius-1");
         }
 
-        buttonContainer.getChildren().addAll(createbtn,updatebtn,viewbtn,formbtn);
+        buttonContainer.getChildren().addAll(viewbtn,formbtn);
     }
 
     private GridPane formHolder(){
@@ -69,42 +90,39 @@ public class SupplierInventory implements Refreshable {
         form.setHgap(20);
 
         Label id = new Label("Supplier ID");
-        TextField supID = new TextField();
         form.add(id,0,0);
         form.add(supID,1,0);
 
         Label fname = new Label("First Name");
-        TextField supFname = new TextField();
         form.add(fname,2,0);
         form.add(supFname,3,0);
 
         Label lname = new Label("Last Name");
-        TextField supLname = new TextField();
         form.add(lname,0,1);
         form.add(supLname,1,1);
 
         Label Minitial = new Label("Middle Initial");
-        TextField supMI = new TextField();
         form.add(Minitial,2,1);
         form.add(supMI,3,1);
 
         Label contactperson = new Label("Contact Person");
-        TextField supPerson = new TextField();
         form.add(contactperson,0,2);
         form.add(supPerson,1,2);
 
         Label email = new Label("Email");
-        TextField supMail = new TextField();
         form.add(email,2,2);
         form.add(supMail,3,2);
 
         Label phoneNum = new Label("Phone Number");
-        TextField supNum = new TextField();
         form.add(phoneNum,0,3);
         form.add(supNum,1,3);
 
-        TextField[] texts = {supID,supFname,supMI,supPerson,supLname,supNum,supMail};
-        Label[] labels = {id,fname,lname,Minitial, contactperson, email,phoneNum};
+        Label address = new Label("Address");
+        form.add(address,2,3);
+        form.add(supAdd,3,3);
+
+        TextField[] texts = {supID,supFname,supMI,supPerson,supLname,supNum,supMail,supAdd};
+        Label[] labels = {id,fname,lname,Minitial, contactperson, email,phoneNum,address};
         for(TextField text : texts){
             text.getStyleClass().addAll("textfield-1","border-radius","background-radius");
         }
@@ -130,7 +148,6 @@ public class SupplierInventory implements Refreshable {
 
     @Override
     public String getValue(){return views.getValue();}
-
     @Override
     public ComboBox<String> getCombo(){
         return supplierCombo();
@@ -138,10 +155,27 @@ public class SupplierInventory implements Refreshable {
 
     @Override
     public Map<String,String> getFormData(){
-        return null;
+        Map<String,String> data = new HashMap<>();
+        data.put("id",supID.getText());
+        data.put("fname",supFname.getText());
+        data.put("lname",supLname.getText());
+        data.put("mi",supMI.getText());
+        data.put("person",supPerson.getText());
+        data.put("mail",supMail.getText());
+        data.put("num",supNum.getText());
+        data.put("address",supAdd.getText());
+        return data;
     }
 
     @Override
     public void clearForm() {
+        supID.clear();
+        supFname.clear();
+        supLname.clear();
+        supMI.clear();
+        supPerson.clear();
+        supMail.clear();
+        supNum.clear();
+        supAdd.clear();
     }
 }

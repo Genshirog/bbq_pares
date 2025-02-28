@@ -18,12 +18,6 @@ public class ReportInventoryHandler implements EventHandler<ActionEvent> {
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "report":
-                refreshable.view_btn();
-                inventory.updateComboHolder(refreshable.getCombo());
-                inventory.showReportTable();
-                inventory.showBackButton();
-                break;
             case "AddRepo":
                 System.out.println("Nigga");
                 break;

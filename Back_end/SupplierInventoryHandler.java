@@ -9,33 +9,24 @@ public class SupplierInventoryHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Inventory inventory;
     private Refreshable refreshable;
-    public SupplierInventoryHandler(String btn, VBox buttonContainer, Inventory inventory, VBox logoutContainer){
+    private DatabaseHandler database;
+    public SupplierInventoryHandler(String btn, VBox buttonContainer, Inventory inventory, VBox logoutContainer, Refreshable refreshable){
         this.btn = btn;
         this.inventory = inventory;
-        this.refreshable= new SupplierInventory(buttonContainer, inventory, logoutContainer);
+        this.refreshable= refreshable;
+        this.database = new DatabaseHandler();
     }
 
     @Override
     public void handle(ActionEvent event){
         switch (btn){
-            case "supplier":
-                refreshable.view_btn();
-                inventory.updateComboHolder(refreshable.getCombo());
-                inventory.showSupplierTable();
-                inventory.showBackButton();
-                break;
             case "SearchSup":
-                System.out.println("Nigga2");
+                inventory.updateSupplierTable(database.searchSupplierView(inventory.getInput(),refreshable.getValue()));
                 break;
             case "ViewSup":
                 refreshable.view_btn();
                 inventory.updateComboHolder(refreshable.getCombo());
                 inventory.showSupplierTable();
-                break;
-            case "FormSup":
-                refreshable.form_btn();
-                inventory.clearComboHolder();
-                inventory.displayForm(refreshable.getForm());
                 break;
             case "Back":
                 inventory.originalComboHolder();

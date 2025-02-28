@@ -139,11 +139,12 @@ public class Manager {
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
             DatabaseHandler db = new DatabaseHandler();
-            List<EmployeeViews> employees = db.getEmployeeView();
             if("Employee View".equals(selectedView)){
+                List<EmployeeViews> employees = db.getEmployeeView();
                 tableHolder.getChildren().add(tableManager.createEmployeeTable(employees));
             }else if("Inventory View".equals(selectedView)){
-                tableHolder.getChildren().add(tableManager.createInventoryTable());
+                List<InventoryViews> inventory = db.getInventoryView();
+                tableHolder.getChildren().add(tableManager.createInventoryTable(inventory));
             }else if("Menu".equals(selectedView)){
                 tableHolder.getChildren().add(tableManager.createMenuTable());
             }else{

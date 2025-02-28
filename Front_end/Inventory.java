@@ -15,6 +15,8 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import java.util.List;
+
 public class Inventory {
     private StackPane root;
     private SceneManager scene;
@@ -23,6 +25,7 @@ public class Inventory {
     private VBox logoutContainer;
     private HBox comboHolder;
     private TableManager tableManager;
+    private TextField input;
     public Inventory(SceneManager scene){
         this.scene = scene;
         this.btnContainer = new VBox(10);
@@ -98,10 +101,12 @@ public class Inventory {
 
     public void updateComboHolder(ComboBox<String> combo){
         comboHolder.getChildren().clear();
-        TextField input = new TextField();
+        input = new TextField();
         input.getStyleClass().addAll("textfield-2","border-radius","background-radius");
         comboHolder.getChildren().addAll(combo,input);
     }
+
+    public String getInput(){return input.getText();}
 
     public void clearComboHolder(){
         comboHolder.getChildren().clear();
@@ -128,14 +133,41 @@ public class Inventory {
                 .map(child -> (VBox) child)
                 .findFirst()
                 .orElse(null);
-
+        DatabaseHandler db = new DatabaseHandler();
+        List<InventoryViews> inventory = db.getInventoryView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
           if("Inventory View".equals(selectedView)){
-            tableHolder.getChildren().add(tableManager.createInventoryTable());
+            tableHolder.getChildren().add(tableManager.createInventoryTable(inventory));
             }else{
                 System.out.println("Does not exist");
             }
+        }
+    }
+
+    public void updateSupplierTable(List<SupplierView> suppliers){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createSupplierTable(suppliers));
+        }
+    }
+
+    public void updateProductTable(List<ProductView> products){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+            tableHolder.getChildren().add(tableManager.createProductTable(products));
         }
     }
 
@@ -157,10 +189,11 @@ public class Inventory {
                 .map(child -> (VBox) child)
                 .findFirst()
                 .orElse(null);
-
+        DatabaseHandler db = new DatabaseHandler();
+        List<ProductView> products = db.getProductView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            //tableHolder.getChildren().add(tableManager.createProductTable());
+            tableHolder.getChildren().add(tableManager.createProductTable(products));
         }
     }
 
@@ -170,10 +203,11 @@ public class Inventory {
                 .map(child -> (VBox) child)
                 .findFirst()
                 .orElse(null);
-
+        DatabaseHandler db = new DatabaseHandler();
+        List<SupplierView> suppliers = db.getSupplierView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            //tableHolder.getChildren().add(tableManager.createSupplierTable());
+            tableHolder.getChildren().add(tableManager.createSupplierTable(suppliers));
         }
     }
 
@@ -183,10 +217,11 @@ public class Inventory {
                 .map(child -> (VBox) child)
                 .findFirst()
                 .orElse(null);
-
+        DatabaseHandler db = new DatabaseHandler();
+        List<InventoryViews> inventory = db.getInventoryView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createInventoryTable());
+            tableHolder.getChildren().add(tableManager.createInventoryTable(inventory));
         }
     }
 
@@ -244,9 +279,9 @@ public class Inventory {
         Button Supplierbtn = new Button("SUPPLIER");
         Button Reportbtn = new Button("REPORT");
 
-        Reportbtn.setOnAction(new ReportInventoryHandler("report",btnContainer,this,logoutContainer));
-        Productbtn.setOnAction(new ProductInventoryHandler("products",btnContainer,this,logoutContainer));
-        Supplierbtn.setOnAction(new SupplierInventoryHandler("supplier",btnContainer,this,logoutContainer));
+        Reportbtn.setOnAction(new InventoryHandler("report",btnContainer,this,logoutContainer));
+        Productbtn.setOnAction(new InventoryHandler("products",btnContainer,this,logoutContainer));
+        Supplierbtn.setOnAction(new InventoryHandler("supplier",btnContainer,this,logoutContainer));
 
         Reportbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
         Productbtn.getStyleClass().addAll("btn-1","background-radius-1","border-radius");
@@ -277,7 +312,7 @@ public class Inventory {
         logoutContainer.getChildren().clear();
         Button back = new Button("Back");
         back.getStyleClass().addAll("btn-1", "border-radius", "background-radius-1");
-        back.setOnAction(new LogoutHandler(scene));
+        back.setOnAction(new InventoryHandler("Back",btnContainer,this,logoutContainer));
         logoutContainer.getChildren().add(back);
     }
 
