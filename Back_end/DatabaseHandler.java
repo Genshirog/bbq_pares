@@ -143,6 +143,29 @@ public class DatabaseHandler {
         }
         return employees;
     }
+
+    public List<RoleView> getRoleView(){
+        List<RoleView> roles = new ArrayList<>();
+        String sql = "SELECT * FROM job_role";
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                RoleView role = new RoleView(
+                rs.getString("JobRoleID"),
+                rs.getString("role_name"),
+                rs.getString("role_description"),
+                rs.getString("role_shift")
+                );
+                roles.add(role);
+            }
+            conn.close();
+        }catch (Exception e){
+            e.getMessage();
+        }
+        return roles;
+    }
     public boolean addRoles(String id, String role, String description, String shift) {
         String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
 
@@ -160,32 +183,46 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean searchRoles(String id, String role, String description, String shift) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
-
-        try (Connection conn = Database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.setString(2, role);
-            pstmt.setString(3, description);
-            pstmt.setString(4, shift);
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (Exception e) {
+    public List<RoleView> searchRolesView(String id, String value){
+        List<RoleView> roles = new ArrayList<>();
+        String sql = switch (value) {
+            case "Role ID" -> "SELECT * FROM job_role WHERE JobRoleID LIKE ?";
+            case "Role" -> "SELECT * FROM job_role WHERE role_name LIKE ?";
+            case "Shift" -> "SELECT * FROM job_role WHERE shift LIKE ?";
+            default -> "";
+        };
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            switch (value) {
+                case "Role ID" -> stmt.setString(1, "%" + id + "%");
+                case "Role", "Shift" -> stmt.setString(1, id + "%");
+            }
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                RoleView roleView = new RoleView(
+                        rs.getString("JobRoleID"),
+                        rs.getString("role_name"),
+                        rs.getString("role_description"),
+                        rs.getString("role_shift")
+                );
+                roles.add(roleView);
+            }
+            conn.close();
+        }catch (Exception e){
             System.out.println(e.getMessage());
-            return false;
         }
+        return roles;
     }
-
     public boolean editRoles(String id, String role, String description, String shift) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
+        String sql = "UPDATE job_role SET role_name = ?, role_description = ?, role_shift = ? WHERE JobRoleID = ?";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, id);
-            pstmt.setString(2, role);
-            pstmt.setString(3, description);
-            pstmt.setString(4, shift);
+            pstmt.setString(1, role);
+            pstmt.setString(2, description);
+            pstmt.setString(3, shift);
+            pstmt.setString(4, id);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -194,15 +231,17 @@ public class DatabaseHandler {
         }
     }
 
-    public boolean deleteRoles(String id, String role, String description, String shift) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
+    public boolean deleteRoles(String id, String value) {
+        String sql = switch (value) {
+            case "Role ID" -> "DELETE FROM job_role WHERE JobRoleID = ?";
+            case "Role" -> "DELETE FROM job_role WHERE role_name = ?";
+            case "Shift" -> "DELETE FROM job_role WHERE role_shift = ?";
+            default -> "";
+        };
 
         try (Connection conn = Database.getConnection();
-             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            pstmt.setString(2, role);
-            pstmt.setString(3, description);
-            pstmt.setString(4, shift);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {

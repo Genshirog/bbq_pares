@@ -15,6 +15,7 @@ import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.util.Duration;
 
+import javax.management.relation.Role;
 import javax.xml.crypto.Data;
 import java.util.List;
 
@@ -164,6 +165,19 @@ public class Manager {
         }
     }
 
+    public void updateRoleTable(List<RoleView> roles){
+        VBox tableHolder = left_panel.getChildren().stream()
+                .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
+                .map(child -> (VBox) child)
+                .findFirst()
+                .orElse(null);
+
+        if(tableHolder != null) {
+            tableHolder.getChildren().clear();
+                tableHolder.getChildren().add(tableManager.createRoleTable(roles));
+        }
+    }
+
     public void displayForm(GridPane form){
         VBox tableHolder = left_panel.getChildren().stream()
                 .filter(child -> child instanceof VBox && ((VBox) child).getStyleClass().contains("table"))
@@ -197,10 +211,11 @@ public class Manager {
                 .map(child -> (VBox) child)
                 .findFirst()
                 .orElse(null);
-
+        DatabaseHandler db = new DatabaseHandler();
+        List<RoleView> roles = db.getRoleView();
         if(tableHolder != null) {
             tableHolder.getChildren().clear();
-            tableHolder.getChildren().add(tableManager.createRoleTable());
+            tableHolder.getChildren().add(tableManager.createRoleTable(roles));
         }
     }
 

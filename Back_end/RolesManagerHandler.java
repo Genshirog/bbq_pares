@@ -36,13 +36,26 @@ public class RolesManagerHandler implements EventHandler<ActionEvent> {
                 }
                 break;
             case "SearchRoles":
-                System.out.println("Nigga2");
+                manager.updateRoleTable(database.searchRolesView(manager.getInput(),refreshable.getValue()));
                 break;
             case "EditRoles":
-                System.out.println("Nigga3");
+                Map<String,String> Editdata = refreshable.getFormData();
+                boolean Editsuccess = database.editRoles(
+                        Editdata.get("id"),
+                        Editdata.get("role"),
+                        Editdata.get("description"),
+                        Editdata.get("shift")
+                );
+
+                if(Editsuccess){
+                    refreshable.clearForm();
+                }
                 break;
             case "RemRoles":
-                System.out.println("Nigga4");
+                boolean deleteSuccess = database.deleteRoles(manager.getInput(),refreshable.getValue());
+                if (deleteSuccess){
+                    manager.showRolesTable();
+                }
                 break;
             case "ViewRoles":
                 refreshable.view_btn();

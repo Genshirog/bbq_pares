@@ -3,6 +3,7 @@ package Front_end;
 import Back_end.EmployeeViews;
 import Back_end.InventoryViews;
 import Back_end.MenuViews;
+import Back_end.RoleView;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -145,25 +146,22 @@ public class TableManager {
         return new VBox(scrollPane);
     }
 
-    public VBox createRoleTable() {
-        TableView<EmployeeViews> table = new TableView<>();
+    public VBox createRoleTable(List<RoleView> roles) {
+        TableView<RoleView> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<EmployeeViews, String> idColumn = new TableColumn<>("RoleID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("roleId"));
-        idColumn.setMaxWidth(250);
+        TableColumn<RoleView, String> idColumn = new TableColumn<>("RoleID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("roleID"));
         idColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> roleColumn = new TableColumn<>("Role");
-        roleColumn.setCellValueFactory(new PropertyValueFactory<>("role"));
-        roleColumn.setMaxWidth(100);
+        TableColumn<RoleView, String> roleColumn = new TableColumn<>("Role");
+        roleColumn.setCellValueFactory(new PropertyValueFactory<>("roleName"));
         roleColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> descriptionColumn = new TableColumn<>("Description");
+        TableColumn<RoleView, String> descriptionColumn = new TableColumn<>("Description");
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
-        descriptionColumn.setMaxWidth(100);
         descriptionColumn.setReorderable(false);
 
-        TableColumn<EmployeeViews, String> shiftColumn = new TableColumn<>("Shift(Day/Night/FullTime)");
+        TableColumn<RoleView, String> shiftColumn = new TableColumn<>("Shift(Day/Night/FullTime)");
         shiftColumn.setCellValueFactory(new PropertyValueFactory<>("shift"));
         shiftColumn.setReorderable(false);
 
@@ -179,7 +177,7 @@ public class TableManager {
 
         VBox.setVgrow(table,Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
-
+        table.getItems().addAll(roles);
         return new VBox(scrollPane);
     }
 
