@@ -22,4 +22,7 @@ public class EmployeeViews {
     public String getEmployeeEmail(){return  email;}
     public String getNumber(){return  number;}
     public String getPassword(){return  password;}
+
+    //This will return what will be displayed to the table remember cellproperty("text") yes it will get from the getText()
+    //It can also be like this ("test") then your public String is getTest() i dont know why but your ("test") 1st letter must be small
 }

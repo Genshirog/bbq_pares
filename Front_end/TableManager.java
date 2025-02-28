@@ -15,6 +15,8 @@ public class TableManager {
 
     }
 
+    //We will display the array of our List<EmployeeViews>
+    //I know its an array because our while loop keep adding contents to our list
     public VBox createEmployeeTable(List<EmployeeViews> employees) {
         TableView<EmployeeViews> table = new TableView<>();
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);

@@ -119,6 +119,10 @@ public class DatabaseHandler {
         }
     }
 
+    //This will add all from the employeeView notice we are calling EmployeeViews on our sql it is to get the columns
+    //rs.getString(matchColumNames) then storing them to the EmployeeViews now once it is stored
+    //We add it to our List and since we are using <EmployeeViews> it will only get data from EmployeeViews
+    //Go to table manager
     public List<EmployeeViews> getEmployeeView(){
         List<EmployeeViews> employees = new ArrayList<>();
         String sql = "SELECT * FROM employee_view";
