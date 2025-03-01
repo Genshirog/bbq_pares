@@ -103,35 +103,24 @@ public class TableManager {
         return new VBox(scrollPane);
     }
 
-    public VBox createMenuTable(){
+    public VBox createMenuTable(List<MenuViews> products) {
         TableView<MenuViews> table = new TableView<>();
-
         table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
-        TableColumn<MenuViews, String> idColumn = new TableColumn<>("MenuID");
-        idColumn.setCellValueFactory(new PropertyValueFactory<>("menuID"));
+        TableColumn<MenuViews, String> idColumn = new TableColumn<>("Product ID");
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("productID"));
         idColumn.setReorderable(false);
 
-        TableColumn<MenuViews, String> nameColumn = new TableColumn<>("Item Name");
-        nameColumn.setCellValueFactory(new PropertyValueFactory<>("itemName"));
-        nameColumn.setReorderable(false);
+        TableColumn<MenuViews, String> prodNameColumn = new TableColumn<>("Product Name");
+        prodNameColumn.setCellValueFactory(new PropertyValueFactory<>("productName"));
+        prodNameColumn.setReorderable(false);
 
-        TableColumn<MenuViews, String> categoryColumn = new TableColumn<>("Category");
-        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
-        categoryColumn.setReorderable(false);
-
-        TableColumn<MenuViews, String> priceColumn = new TableColumn<>("Price");
+        TableColumn<MenuViews, Double> priceColumn = new TableColumn<>("Price");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setReorderable(false);
 
-        TableColumn<MenuViews, String> availabilityColumn = new TableColumn<>("Availability");
-        availabilityColumn.setCellValueFactory(new PropertyValueFactory<>("availability"));
-        availabilityColumn.setReorderable(false);
+        table.getColumns().addAll(idColumn,prodNameColumn,priceColumn);
+        table.setTableMenuButtonVisible(false);
 
-        TableColumn<MenuViews, String> stockDetails = new TableColumn<>("Details");
-        stockDetails.setCellValueFactory(new PropertyValueFactory<>("details"));
-        stockDetails.setReorderable(false);
-
-        table.getColumns().addAll(idColumn, nameColumn, categoryColumn, priceColumn, availabilityColumn,stockDetails);
         VBox.setVgrow(table, Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
 
@@ -141,6 +130,7 @@ public class TableManager {
 
         VBox.setVgrow(table,Priority.ALWAYS);
         table.setMaxHeight(Double.MAX_VALUE);
+        table.getItems().addAll(products);
 
         return new VBox(scrollPane);
     }

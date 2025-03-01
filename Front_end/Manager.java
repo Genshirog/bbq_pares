@@ -146,7 +146,8 @@ public class Manager {
                 List<InventoryViews> inventory = db.getInventoryView();
                 tableHolder.getChildren().add(tableManager.createInventoryTable(inventory));
             }else if("Menu".equals(selectedView)){
-                tableHolder.getChildren().add(tableManager.createMenuTable());
+                List<MenuViews> menu = db.getMenuView();
+                tableHolder.getChildren().add(tableManager.createMenuTable(menu));
             }else{
                 System.out.println("Does not exist");
             }

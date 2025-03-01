@@ -174,6 +174,28 @@ public class DatabaseHandler {
         return inventory;
     }
 
+    public List<MenuViews> getMenuView(){
+        List<MenuViews> menu = new ArrayList<>();
+        String sql = "SELECT * FROM menu_view";
+        try{
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                MenuViews menus = new MenuViews(
+                    rs.getString("productID"),
+                    rs.getString("productName"),
+                    rs.getString("price")
+                );
+                menu.add(menus);
+            }
+            conn.close();
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return menu;
+    }
+
     public List<RoleView> getRoleView(){
         List<RoleView> roles = new ArrayList<>();
         String sql = "SELECT * FROM job_role";
