@@ -199,7 +199,7 @@ public class DatabaseHandler {
 
     public List<ProductView> getProductView(){
         List<ProductView> products = new ArrayList<>();
-        String sql = "SELECT * FROM products";
+        String sql = "SELECT * FROM product_view";
         try{
             Connection conn = Database.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -352,9 +352,9 @@ public class DatabaseHandler {
     public List<ProductView> searchProductView(String id, String value){
         List<ProductView> roles = new ArrayList<>();
         String sql = switch (value) {
-            case "Product ID" -> "SELECT * FROM products WHERE ProductID LIKE ?";
-            case "Product Name" -> "SELECT * FROM products WHERE ProductName LIKE ?";
-            case "Supplier ID" -> "SELECT * FROM products WHERE SupplierID LIKE ?";
+            case "Product ID" -> "SELECT * FROM product_view WHERE ProductID LIKE ?";
+            case "Product Name" -> "SELECT * FROM product_view WHERE ProductName LIKE ?";
+            case "Supplier" -> "SELECT * FROM product_view WHERE SupplierName LIKE ?";
             default -> "";
         };
         try{
