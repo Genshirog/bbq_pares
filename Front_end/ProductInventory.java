@@ -80,7 +80,7 @@ public class ProductInventory implements Refreshable {
         form.setVgap(50);
         form.setHgap(20);
 
-        Label id = new Label("Product ID");
+        Label id = new Label("Inventory ID");
         form.add(id,0,0);
         form.add(prodId,1,0);
 
@@ -125,7 +125,7 @@ public class ProductInventory implements Refreshable {
     public Map<String,String> getFormData(){
         Map<String,String> data = new HashMap<>();
         data.put("id", prodId.getText());
-        data.put("name", prodQuantity.getText());
+        data.put("stock_quantity", prodQuantity.getText());
         return data;
     }
 

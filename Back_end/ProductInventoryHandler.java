@@ -27,12 +27,9 @@ public class ProductInventoryHandler implements EventHandler<ActionEvent> {
                 break;
             case "EditProd":
                 Map<String,String> Editdata = refreshable.getFormData();
-                boolean Editsuccess = database.updateProducts(
+                boolean Editsuccess = database.updateInventory(
                         Editdata.get("id"),
-                        Editdata.get("name"),
-                        Editdata.get("price"),
-                        Editdata.get("cost"),
-                        Editdata.get("supplier")
+                        Editdata.get("stock_quantity")
                 );
 
                 if(Editsuccess){

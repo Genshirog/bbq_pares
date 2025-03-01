@@ -2,6 +2,7 @@ package Back_end;
 
 import javafx.scene.control.ComboBox;
 
+import javax.swing.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -150,7 +151,7 @@ public class DatabaseHandler {
 
     public List<InventoryViews> getInventoryView(){
         List<InventoryViews> inventory = new ArrayList<>();
-        String sql = "SELECT * FROM inventory";
+        String sql = "SELECT * FROM inventory_view";
         try{
             Connection conn = Database.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql);
@@ -158,8 +159,8 @@ public class DatabaseHandler {
             while (rs.next()){
                 InventoryViews inventories = new InventoryViews(
                 rs.getString("InventoryID"),
-                rs.getString("ProductID"),
-                rs.getString("SupplierID"),
+                rs.getString("ProductName"),
+                rs.getString("SupplierName"),
                 rs.getString("stock_quantity"),
                 rs.getString("stock_date"),
                 rs.getString("availability")
@@ -168,7 +169,7 @@ public class DatabaseHandler {
             }
             conn.close();
         }catch (Exception e){
-            e.getMessage();
+            System.out.println(e.getMessage());
         }
         return inventory;
     }
@@ -514,5 +515,25 @@ public class DatabaseHandler {
         }
     }
 
+
+    public boolean updateInventory(String id, String quantity){
+        String sql = "UPDATE inventory SET stock_quantity = stock_quantity + ? WHERE inventoryID = ?";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            int getQuantity = Integer.parseInt(quantity);
+            if(getQuantity < 0){
+                JOptionPane.showMessageDialog(null,"BOBO KABA!? Negative STOCK IN?");
+            }else {
+                pstmt.setString(1, quantity);
+                pstmt.setString(2, id);
+            }
+            int rowsAffected = pstmt.executeUpdate();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
     // Add other methods for updating, deleting, and retrieving employees
 }
