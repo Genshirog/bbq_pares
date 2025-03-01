@@ -191,6 +191,7 @@ public class DatabaseHandler {
             }
             conn.close();
         }catch (Exception e){
+
             System.out.println(e.getMessage());
         }
         return menu;
@@ -556,6 +557,27 @@ public class DatabaseHandler {
             System.out.println(e.getMessage());
             return false;
         }
+    }
+
+    public String loginKey(String username, String password, String value){
+        try{
+            Connection conn = Database.getConnection();
+            String sql = "SELECT * FROM accounts WHERE username = ? AND password = ? AND JobRoleID = ?";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            stmt.setString(1,username);
+            stmt.setString(2,password);
+            stmt.setString(3,value);
+            stmt.executeQuery();
+            switch (value){
+                case "Manager" -> {return "Manager";}
+                case "Cashier" -> {return "Cashier";}
+                case "Inventory Clerk" -> {return "Inventory Clerk";}
+                default -> {return "Invalid";}
+            }
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+        return "";
     }
     // Add other methods for updating, deleting, and retrieving employees
 }

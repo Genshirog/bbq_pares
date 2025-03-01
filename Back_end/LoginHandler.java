@@ -6,6 +6,9 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.util.Duration;
+
+import javax.xml.crypto.Data;
+
 public class LoginHandler implements EventHandler<ActionEvent> {
     private final TextField username;
     private final PasswordField password;
@@ -25,14 +28,14 @@ public class LoginHandler implements EventHandler<ActionEvent> {
         String username = this.username.getText();
         String password = this.password.getText();
         String role = this.role.getValue();
-        if(username.equals("Dog") && password.equals("Cat") && role.equals("Manager")){
-            this.scene.show_main_manager();
-            this.errormsg.setVisible(false);
-        }else if(username.equals("Dog") && password.equals("Cat") && role.equals("Cashier")){
-            this.scene.show_main_cashierorder();
-            this.errormsg.setVisible(false);
-        }else if(username.equals("Dog") && password.equals("Cat") && role.equals("Inventory Clerk")){
-            this.scene.show_main_inventory();
+        DatabaseHandler db = new DatabaseHandler();
+        String key = db.loginKey(username,password,role);
+        if(key.equals(role)){
+            switch (role){
+                case "Manager" -> this.scene.show_main_manager();
+                case "Cashier" -> this.scene.show_main_cashierorder();
+                case "Inventory Clerk" -> this.scene.show_main_inventory();
+            }
             this.errormsg.setVisible(false);
         }else{
             shakeFields();
