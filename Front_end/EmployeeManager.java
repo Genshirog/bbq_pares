@@ -9,6 +9,7 @@ import javafx.scene.layout.VBox;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.UnaryOperator;
 
 public class EmployeeManager implements Refreshable {
     private final VBox buttonContainer;
@@ -79,6 +80,13 @@ public class EmployeeManager implements Refreshable {
         this.empFname = new TextField();
         this.empLname = new TextField();
         this.empMI = new TextField();
+        UnaryOperator<TextFormatter.Change> filter = change -> {
+          if(change.getControlNewText().length() > 1){
+              return null;
+          }
+          return change;
+        };
+        empMI.setTextFormatter(new TextFormatter<>(filter));
         this.empRole = new TextField();
         this.empMail = new TextField();
         this.empNum = new TextField();

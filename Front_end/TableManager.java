@@ -2,6 +2,7 @@ package Front_end;
 
 import Back_end.*;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -117,6 +118,18 @@ public class TableManager {
         TableColumn<MenuViews, Double> priceColumn = new TableColumn<>("Price");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setReorderable(false);
+        priceColumn.setCellFactory(column -> new TableCell<MenuViews, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+
+                if (empty || price == null) {
+                    setText(null);
+                } else {
+                    setText("₱" + String.format("%.2f", price));
+                }
+            }
+        });
 
         table.getColumns().addAll(idColumn,prodNameColumn,priceColumn);
         table.setTableMenuButtonVisible(false);
@@ -184,11 +197,32 @@ public class TableManager {
         TableColumn<ProductView, Double> priceColumn = new TableColumn<>("Product Price");
         priceColumn.setCellValueFactory(new PropertyValueFactory<>("price"));
         priceColumn.setReorderable(false);
+        priceColumn.setCellFactory(column -> new TableCell<ProductView, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+
+                if (empty || price == null) {
+                    setText(null);
+                } else {
+                    setText("₱" + String.format("%.2f", price));
+                }
+            }
+        });
 
         TableColumn<ProductView, Double> costColumn = new TableColumn<>("Product Cost");
         costColumn.setCellValueFactory(new PropertyValueFactory<>("cost"));
         costColumn.setReorderable(false);
-
+        costColumn.setCellFactory(column -> new TableCell<ProductView, Double>(){
+            @Override
+            protected void updateItem(Double cost, boolean empty){
+                if(empty || cost == null){
+                    setText(null);
+                }else{
+                    setText("₱" + String.format("%.2f", cost));
+                }
+            }
+        });
         TableColumn<ProductView, String> supplierColumn = new TableColumn<>("Product Supplier");
         supplierColumn.setCellValueFactory(new PropertyValueFactory<>("supplierID"));
         supplierColumn.setReorderable(false);

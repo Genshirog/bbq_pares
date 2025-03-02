@@ -1,37 +1,48 @@
 package Back_end;
 
-import javafx.scene.control.ComboBox;
-
+import java.util.Base64;
+import java.nio.charset.StandardCharsets;
 import javax.swing.*;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler {
     private Connection database;
-
+    private Formatter builder;
     public  DatabaseHandler(){
+        this.builder = new Formatter();
+    }
+
+    public String encodePassword(String password) {
+        byte[] passwordBytes = password.getBytes(StandardCharsets.UTF_8);
+        String encodedPassword = Base64.getEncoder().encodeToString(passwordBytes);
+        return encodedPassword;
+    }
+
+    // To decode a Base64 password (if you need to)
+    public String decodePassword(String encodedPassword) {
+        byte[] decodedBytes = Base64.getDecoder().decode(encodedPassword);
+        String decodedPassword = new String(decodedBytes, StandardCharsets.UTF_8);
+        return decodedPassword;
     }
 
     public boolean addEmployee(String id, String firstName, String lastName, String middleInitial,
                                String role, String email, String phoneNumber, String password) {
 
         String sql = "INSERT INTO employee (EmployeeID, first_name, last_name, middle_initial, JobRoleID, phone_number, email, password) VALUES  (?, ?, ?, ?, ?, ?, ?, ?)";
-
         try {
             Connection conn = Database.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, id);
-            pstmt.setString(2, firstName);
-            pstmt.setString(3, lastName);
-            pstmt.setString(4, middleInitial);
-            pstmt.setString(5, role);
-            pstmt.setString(6, phoneNumber);
-            pstmt.setString(7, email);
+            pstmt.setString(1, id.toUpperCase());
+            pstmt.setString(2, builder.capitalizeLetters(firstName));
+            pstmt.setString(3, builder.capitalizeLetters(lastName));
+            pstmt.setString(4, builder.capitalizeLetters(middleInitial));
+            pstmt.setString(5, role.toUpperCase());
+            pstmt.setString(6, builder.phone_formatter(phoneNumber));
+            pstmt.setString(7, builder.isValidEmail(email));
             pstmt.setString(8, password);
             int rowsAffected = pstmt.executeUpdate();
             conn.close();
@@ -66,7 +77,7 @@ public class DatabaseHandler {
                         rs.getString("JobRoleID"),
                         rs.getString("email"),
                         rs.getString("phone_number"),
-                        rs.getString("password")
+                        encodePassword(rs.getString("password"))
                 );
                 employees.add(employee);
             }
@@ -84,12 +95,12 @@ public class DatabaseHandler {
 
         try{Connection conn = Database.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, firstName);
-            pstmt.setString(2, lastName);
-            pstmt.setString(3, middleInitial);
+            pstmt.setString(1, builder.capitalizeLetters(firstName));
+            pstmt.setString(2, builder.capitalizeLetters(lastName));
+            pstmt.setString(3, builder.capitalizeLetters(middleInitial));
             pstmt.setString(4, role);
-            pstmt.setString(5, email);
-            pstmt.setString(6, phoneNumber);
+            pstmt.setString(5, builder.isValidEmail(email));
+            pstmt.setString(6, builder.phone_formatter(phoneNumber));
             pstmt.setString(7, password);
             pstmt.setString(8, id);
 
@@ -138,7 +149,7 @@ public class DatabaseHandler {
                 rs.getString("JobRoleID"),
                 rs.getString("email"),
                 rs.getString("phone_number"),
-                rs.getString("password")
+                encodePassword(rs.getString("password"))
                 );
                 employees.add(employee);
             }
@@ -185,7 +196,7 @@ public class DatabaseHandler {
                 MenuViews menus = new MenuViews(
                     rs.getString("productID"),
                     rs.getString("productName"),
-                    rs.getString("price")
+                    rs.getDouble("price")
                 );
                 menu.add(menus);
             }
@@ -231,8 +242,8 @@ public class DatabaseHandler {
                 ProductView product = new ProductView(
                 rs.getString("productID"),
                 rs.getString("productName"),
-                rs.getString("price"),
-                rs.getString("cost"),
+                rs.getDouble("price"),
+                rs.getDouble("cost"),
                 rs.getString("supplierID")
                 );
                 products.add(product);
@@ -276,9 +287,9 @@ public class DatabaseHandler {
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            pstmt.setString(2, role);
-            pstmt.setString(3, description);
-            pstmt.setString(4, shift);
+            pstmt.setString(2, builder.capitalizeLetters(role));
+            pstmt.setString(3, builder.capitalizeLetters(description));
+            pstmt.setString(4, builder.isValidShift(builder.capitalizeHyphenLetters(shift)));
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -323,9 +334,9 @@ public class DatabaseHandler {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, role);
-            pstmt.setString(2, description);
-            pstmt.setString(3, shift);
+            pstmt.setString(1, builder.capitalizeLetters(role));
+            pstmt.setString(2, builder.capitalizeLetters(description));
+            pstmt.setString(3, builder.isValidShift(builder.capitalizeHyphenLetters(shift)));
             pstmt.setString(4, id);
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
@@ -360,7 +371,7 @@ public class DatabaseHandler {
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            pstmt.setString(2, name);
+            pstmt.setString(2, builder.capitalizeLetters(name));
             pstmt.setString(3, price);
             pstmt.setString(4, cost);
             pstmt.setString(5, supplier);
@@ -392,8 +403,8 @@ public class DatabaseHandler {
                 ProductView prodView = new ProductView(
                         rs.getString("productID"),
                         rs.getString("productName"),
-                        rs.getString("price"),
-                        rs.getString("cost"),
+                        rs.getDouble("price"),
+                        rs.getDouble("cost"),
                         rs.getString("supplierID")
                 );
                 roles.add(prodView);
@@ -410,7 +421,7 @@ public class DatabaseHandler {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, name);
+            pstmt.setString(1, builder.capitalizeLetters(name));
             pstmt.setString(2, price);
             pstmt.setString(3, cost);
             pstmt.setString(4, supplier);
@@ -448,13 +459,13 @@ public class DatabaseHandler {
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setString(1, id);
-            pstmt.setString(2, fname);
-            pstmt.setString(3, lname);
-            pstmt.setString(4, mi);
-            pstmt.setString(5, person);
-            pstmt.setString(6, mail);
-            pstmt.setString(7, num);
-            pstmt.setString(8, add);
+            pstmt.setString(2, builder.capitalizeLetters(fname));
+            pstmt.setString(3, builder.capitalizeLetters(lname));
+            pstmt.setString(4, builder.capitalizeLetters(mi));
+            pstmt.setString(5, builder.capitalizeLetters(person));
+            pstmt.setString(6, builder.isValidEmail(mail));
+            pstmt.setString(7, builder.phone_formatter(num));
+            pstmt.setString(8, builder.capitalizeLetters(add));
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -502,13 +513,13 @@ public class DatabaseHandler {
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, fname);
-            pstmt.setString(2, lname);
-            pstmt.setString(3, mi);
-            pstmt.setString(4, person);
-            pstmt.setString(5, add);
-            pstmt.setString(6, mail);
-            pstmt.setString(7, num);
+            pstmt.setString(1, builder.capitalizeLetters(fname));
+            pstmt.setString(2, builder.capitalizeLetters(lname));
+            pstmt.setString(3, builder.capitalizeLetters(mi));
+            pstmt.setString(4, builder.capitalizeLetters(person));
+            pstmt.setString(5, builder.capitalizeLetters(add));
+            pstmt.setString(6, builder.isValidEmail(mail));
+            pstmt.setString(7, builder.phone_formatter(num));
             pstmt.setString(8, id);
 
             int rowsAffected = pstmt.executeUpdate();
@@ -548,7 +559,7 @@ public class DatabaseHandler {
             if(getQuantity < 0){
                 JOptionPane.showMessageDialog(null,"BOBO KABA!? Negative STOCK IN?");
             }else {
-                pstmt.setString(1, quantity);
+                pstmt.setInt(1, getQuantity);
                 pstmt.setString(2, id);
             }
             int rowsAffected = pstmt.executeUpdate();
@@ -567,12 +578,14 @@ public class DatabaseHandler {
             stmt.setString(1,username);
             stmt.setString(2,password);
             stmt.setString(3,value);
-            stmt.executeQuery();
-            switch (value){
-                case "Manager" -> {return "Manager";}
-                case "Cashier" -> {return "Cashier";}
-                case "Inventory Clerk" -> {return "Inventory Clerk";}
-                default -> {return "Invalid";}
+            ResultSet rs = stmt.executeQuery();
+
+            if(rs.next()) {
+                // If a match is found, return the role
+                return value;
+            } else {
+                // No match found, return empty string or some error indicator
+                return "";
             }
         }catch (Exception e){
             System.out.println(e.getMessage());
