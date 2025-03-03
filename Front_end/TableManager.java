@@ -1,6 +1,8 @@
 package Front_end;
 
 import Back_end.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -332,5 +334,107 @@ public class TableManager {
         table.setMaxHeight(Double.MAX_VALUE);
 
         return new VBox(scrollPane);
+    }
+
+    public TableView<MenuItem> setupMenuTable(CashierOrder cashierOrder) {
+        TableView<MenuItem> menuTable = new TableView<>();
+        menuTable.getStyleClass().add("menu-table");
+        menuTable.setPrefSize(750, 900);
+
+        // Columns
+        TableColumn<MenuItem, String> codeCol = new TableColumn<>("Code");
+        codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
+        codeCol.setPrefWidth(180);
+        codeCol.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-alignment: CENTER;");
+        codeCol.setReorderable(false);
+        codeCol.setResizable(false);
+        codeCol.setSortable(false);
+
+        TableColumn<MenuItem, String> nameCol = new TableColumn<>("Name");
+        nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
+        nameCol.setPrefWidth(280);
+        nameCol.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-alignment: CENTER;");
+        nameCol.setReorderable(false);
+        nameCol.setResizable(false);
+        nameCol.setSortable(false);
+
+        TableColumn<MenuItem, Double> priceCol = new TableColumn<>("Price");
+        priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
+        priceCol.setPrefWidth(300);
+        priceCol.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-alignment: CENTER;");
+        priceCol.setReorderable(false);
+        priceCol.setResizable(false);
+        priceCol.setSortable(false);
+        priceCol.setCellFactory(col -> new TableCell<MenuItem, Double>() {
+            @Override
+            protected void updateItem(Double price, boolean empty) {
+                super.updateItem(price, empty);
+                if (empty || price == null) {
+                    setText(null);
+                } else {
+                    setText("₱" + String.format("%.2f", price));
+                }
+            }
+        });
+
+        menuTable.getColumns().addAll(codeCol, nameCol, priceCol);
+
+        // Data
+        ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
+
+        // Add menu data
+        // PARES MEALS
+        menuItems.add(new MenuItem("A1", "PARES", 80.0));
+        menuItems.add(new MenuItem("A2", "Beef PARES", 80.0));
+        menuItems.add(new MenuItem("A3", "OVERLOAD PARES", 100.0));
+
+        // FRIED & GRILLED MEALS
+        menuItems.add(new MenuItem("B1", "KAWALI", 90.0));
+        menuItems.add(new MenuItem("B2", "BULAK-BULAK", 90.0));
+        menuItems.add(new MenuItem("B3", "LIEMPO", 95.0));
+
+        // CHICKEN MEALS
+        menuItems.add(new MenuItem("C1", "PAA", 85.0));
+        menuItems.add(new MenuItem("C2", "PETCHO", 85.0));
+        menuItems.add(new MenuItem("C3", "CHOT", 85.0));
+
+        // PORK INNARDS & SPECIALTY
+        menuItems.add(new MenuItem("D1", "POUL", 15.0));
+        menuItems.add(new MenuItem("D2", "BAT", 15.0));
+        menuItems.add(new MenuItem("D3", "ATAY", 15.0));
+        menuItems.add(new MenuItem("D4", "ISAW", 10.0));
+        menuItems.add(new MenuItem("D5", "ISOL", 25.0));
+        menuItems.add(new MenuItem("D6", "LIOG", 20.0));
+        menuItems.add(new MenuItem("D7", "CS", 20.0));
+        menuItems.add(new MenuItem("D8", "CM", 20.0));
+        menuItems.add(new MenuItem("D9", "PICHO", 20.0));
+
+        // HOTDOG MEALS
+        menuItems.add(new MenuItem("E1", "HOTDOG", 15.0));
+        menuItems.add(new MenuItem("E2", "HOTDOG TJ", 20.0));
+
+        // SEAFOOD MEALS
+        menuItems.add(new MenuItem("F1", "PANGA BANGUS", 150.0));
+        menuItems.add(new MenuItem("F2", "PANGAS", 150.0));
+        menuItems.add(new MenuItem("F3", "PUSIT", 150.0));
+        menuItems.add(new MenuItem("F4", "BELLY", 120.0));
+
+        // SIDES & ADD-ONS
+        menuItems.add(new MenuItem("G1", "RICE", 15.0));
+        menuItems.add(new MenuItem("G2", "KASALO", 40.0));
+
+        menuTable.setItems(menuItems);
+
+        // Setup actions for menu table
+        menuTable.setOnMouseClicked(event -> {
+            if (event.getClickCount() == 1) {
+                MenuItem selectedItem = menuTable.getSelectionModel().getSelectedItem();
+                if (selectedItem != null) {
+                    //display to the container
+                    cashierOrder.addToOrder(selectedItem);
+                }
+            }
+        });
+        return menuTable;
     }
 }
