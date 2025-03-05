@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import javax.swing.*;
 import java.util.Map;
 
 public class RolesManagerHandler implements EventHandler<ActionEvent> {
@@ -33,6 +34,7 @@ public class RolesManagerHandler implements EventHandler<ActionEvent> {
 
                 if(success){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"A Role was successfully added");
                 }
                 break;
             case "SearchRoles":
@@ -48,12 +50,14 @@ public class RolesManagerHandler implements EventHandler<ActionEvent> {
                 );
 
                 if(Editsuccess){
+                    JOptionPane.showMessageDialog(null,"The Role was successfully updated");
                     refreshable.clearForm();
                 }
                 break;
             case "RemRoles":
                 boolean deleteSuccess = database.deleteRoles(manager.getInput(),refreshable.getValue());
                 if (deleteSuccess){
+                    JOptionPane.showMessageDialog(null,"The Role was successfully deleted");
                     manager.showRolesTable();
                 }
                 break;

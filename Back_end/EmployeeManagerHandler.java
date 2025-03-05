@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import javax.swing.*;
 import java.util.Map;
 
 public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
@@ -37,6 +38,7 @@ public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
 
                 if(success){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"An Employee was successfully added");
                 }
                 break;
             case "SearchEmp":
@@ -56,12 +58,14 @@ public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
                 );
                 if(Editsuccess){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"An Employee was successfully updated");
                 }
                 break;
             case "RemEmp":
                 boolean deleteSuccess = database.deleteEmployee(manager.getInput(),refreshable.getValue());
                 if (deleteSuccess){
                     manager.showEmployeeTable();
+                    JOptionPane.showMessageDialog(null,"An Employee was successfully removed");
                 }
                 break;
             case "ViewEmp":

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import javax.swing.*;
 import java.util.Map;
 
 public class ProductInventoryHandler implements EventHandler<ActionEvent> {
@@ -33,13 +34,8 @@ public class ProductInventoryHandler implements EventHandler<ActionEvent> {
                 );
 
                 if(Editsuccess){
+                    JOptionPane.showMessageDialog(null,"A Product was successfully stocked");
                     refreshable.clearForm();
-                }
-                break;
-            case "RemProd":
-                boolean deleteSuccess = database.deleteProducts(inventory.getInput(),refreshable.getValue());
-                if (deleteSuccess){
-                    inventory.showProductTable();
                 }
                 break;
             case "ViewProd":

@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import javax.swing.*;
 import java.util.Map;
 
 public class SupplierManagerHandler implements EventHandler<ActionEvent> {
@@ -36,6 +37,7 @@ public class SupplierManagerHandler implements EventHandler<ActionEvent> {
                 );
                 if(success){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"A Supplier was successfully added");
                 }
                 break;
             case "SearchSup":
@@ -55,12 +57,14 @@ public class SupplierManagerHandler implements EventHandler<ActionEvent> {
                 );
                 if(editsuccess){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"A Supplier was successfully updated");
                 }
                 break;
             case "RemSup":
                 boolean deleteSuccess = database.deleteSupplier(manager.getInput(),refreshable.getValue());
                 if (deleteSuccess){
                     manager.showProductTable();
+                    JOptionPane.showMessageDialog(null,"A Supplier was successfully removed");
                 }
                 break;
             case "ViewSup":

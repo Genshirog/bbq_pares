@@ -5,6 +5,7 @@ import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
 
+import javax.swing.*;
 import java.util.Map;
 
 public class ProductManagerHandler implements EventHandler<ActionEvent> {
@@ -34,6 +35,7 @@ public class ProductManagerHandler implements EventHandler<ActionEvent> {
 
                 if(success){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"A Product was successfully added");
                 }
                 break;
             case "SearchProd":
@@ -51,12 +53,14 @@ public class ProductManagerHandler implements EventHandler<ActionEvent> {
 
                 if(Editsuccess){
                     refreshable.clearForm();
+                    JOptionPane.showMessageDialog(null,"A Product was successfully updated");
                 }
                 break;
             case "RemProd":
                 boolean deleteSuccess = database.deleteProducts(manager.getInput(),refreshable.getValue());
                 if (deleteSuccess){
                     manager.showProductTable();
+                    JOptionPane.showMessageDialog(null,"A Product was successfully removed");
                 }
                 break;
             case "ViewProd":

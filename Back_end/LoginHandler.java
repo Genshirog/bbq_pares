@@ -7,6 +7,7 @@ import javafx.event.EventHandler;
 import javafx.scene.control.*;
 import javafx.util.Duration;
 
+import javax.swing.*;
 import javax.xml.crypto.Data;
 
 public class LoginHandler implements EventHandler<ActionEvent> {
@@ -36,6 +37,7 @@ public class LoginHandler implements EventHandler<ActionEvent> {
                 case "Cashier" -> this.scene.show_main_cashierorder();
                 case "Inventory Clerk" -> this.scene.show_main_inventory();
             }
+            JOptionPane.showMessageDialog(null,"Log in Successfully");
             this.errormsg.setVisible(false);
         }else{
             shakeFields();

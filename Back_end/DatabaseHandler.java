@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DatabaseHandler {
-    private Connection database;
     private Formatter builder;
     public  DatabaseHandler(){
         this.builder = new Formatter();
@@ -31,27 +30,27 @@ public class DatabaseHandler {
 
     public boolean addEmployee(String id, String firstName, String lastName, String middleInitial,
                                String role, String email, String phoneNumber, String password) {
+        String sql = "CALL insert_employee(?, ?, ?, ?, ?, ?, ?, ?)";
+            try {
+                Connection conn = Database.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setString(1, id.toUpperCase());
+                pstmt.setString(2, builder.capitalizeLetters(firstName));
+                pstmt.setString(3, builder.capitalizeLetters(lastName));
+                pstmt.setString(4, builder.capitalizeLetters(middleInitial));
+                pstmt.setString(5, role.toUpperCase());
+                pstmt.setString(6, builder.isValidEmail(email));
+                pstmt.setString(7, builder.phone_formatter(phoneNumber));
+                pstmt.setString(8, password);
+                int rowsAffected = pstmt.executeUpdate();
+                conn.close();
+                pstmt.close();
+                return rowsAffected > 0;
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                return false;
+            }
 
-        String sql = "INSERT INTO employee (EmployeeID, first_name, last_name, middle_initial, JobRoleID, phone_number, email, password) VALUES  (?, ?, ?, ?, ?, ?, ?, ?)";
-        try {
-            Connection conn = Database.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);
-            pstmt.setString(1, id.toUpperCase());
-            pstmt.setString(2, builder.capitalizeLetters(firstName));
-            pstmt.setString(3, builder.capitalizeLetters(lastName));
-            pstmt.setString(4, builder.capitalizeLetters(middleInitial));
-            pstmt.setString(5, role.toUpperCase());
-            pstmt.setString(6, builder.phone_formatter(phoneNumber));
-            pstmt.setString(7, builder.isValidEmail(email));
-            pstmt.setString(8, password);
-            int rowsAffected = pstmt.executeUpdate();
-            conn.close();
-            pstmt.close();
-            return rowsAffected > 0;
-        } catch (Exception e) {
-            System.out.println(e.getMessage());
-            return false;
-        }
     }
 
     public List<EmployeeViews> searchEmployeeView(String id, String value){
@@ -77,7 +76,7 @@ public class DatabaseHandler {
                         rs.getString("JobRoleID"),
                         rs.getString("email"),
                         rs.getString("phone_number"),
-                        encodePassword(rs.getString("password"))
+                        !rs.getString("password").equals("No Password") ? encodePassword(rs.getString("password")) : rs.getString("password")
                 );
                 employees.add(employee);
             }
@@ -91,7 +90,7 @@ public class DatabaseHandler {
     public boolean updateEmployee(String id, String firstName, String lastName, String middleInitial,
                                String role, String email, String phoneNumber, String password) {
 
-        String sql = "UPDATE employee SET first_name = ?, last_name = ?, middle_initial = ?, JobRoleID = ?, phone_number = ?, email = ?, password = ? WHERE EmployeeID = ?";
+        String sql = "CALL update_employee(?,?,?,?,?,?,?,?)";
 
         try{Connection conn = Database.getConnection();
             PreparedStatement pstmt = conn.prepareStatement(sql);
@@ -115,7 +114,7 @@ public class DatabaseHandler {
     public boolean deleteEmployee(String id, String value) {
         String sql = switch (value) {
             case "Employee ID" -> "DELETE FROM employee WHERE employeeID = ?";
-            case "EmployeeName" -> "DELETE FROM employee WHERE employeeName = ?";
+            case "EmployeeName" -> "DELETE FROM employee WHERE concat(last_name,', ', first_name,' ', middle_initial,'.') = ?";
             case "Role" -> "DELETE FROM employee WHERE JobRoleID = ?";
             default -> "";
         };
@@ -149,7 +148,7 @@ public class DatabaseHandler {
                 rs.getString("JobRoleID"),
                 rs.getString("email"),
                 rs.getString("phone_number"),
-                encodePassword(rs.getString("password"))
+                !rs.getString("password").equals("No Password") ? encodePassword(rs.getString("password")) : rs.getString("password")
                 );
                 employees.add(employee);
             }
@@ -282,7 +281,7 @@ public class DatabaseHandler {
 
 
     public boolean addRoles(String id, String role, String description, String shift) {
-        String sql = "INSERT INTO job_role (JobRoleID, role_name, role_description, role_shift) VALUES  (?, ?, ?, ?)";
+        String sql = "CALL insert_role(?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -330,7 +329,7 @@ public class DatabaseHandler {
         return roles;
     }
     public boolean editRoles(String id, String role, String description, String shift) {
-        String sql = "UPDATE job_role SET role_name = ?, role_description = ?, role_shift = ? WHERE JobRoleID = ?";
+        String sql = "CALL update_role(?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -366,7 +365,7 @@ public class DatabaseHandler {
     }
 
     public boolean addProducts(String id, String name, String price, String cost, String supplier) {
-        String sql = "INSERT INTO products (ProductID, ProductName, Price, Cost, SupplierID) VALUES  (?, ?, ?, ?,?)";
+        String sql = "CALL insert_product(?,?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -417,15 +416,16 @@ public class DatabaseHandler {
     }
 
     public boolean updateProducts(String id, String name, String price, String cost, String supplier) {
-        String sql = "UPDATE products SET productName = ?, price = ?, cost = ?, supplierID = ? WHERE productID = ?";
+        String sql = "CALL update_products(?,?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
-            pstmt.setString(1, builder.capitalizeLetters(name));
-            pstmt.setString(2, price);
-            pstmt.setString(3, cost);
-            pstmt.setString(4, supplier);
-            pstmt.setString(5, id);
+            pstmt.setString(1, id);
+            pstmt.setString(2, builder.capitalizeLetters(name));
+            pstmt.setString(3, price);
+            pstmt.setString(4, cost);
+            pstmt.setString(5, supplier);
+
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (Exception e) {
@@ -454,7 +454,7 @@ public class DatabaseHandler {
     }
 
     public boolean addSupplier(String id, String fname, String lname, String mi, String person, String mail, String num, String add) {
-        String sql = "INSERT INTO supplier (supplierID, first_name, last_name, middle_initial,contact_person,phone_number,email,address) VALUES  (?, ?, ?, ?,?,?,?,?)";
+        String sql = "CALL insert_supplier(?, ?, ?, ?,?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -509,7 +509,7 @@ public class DatabaseHandler {
     }
 
     public boolean updateSupplier(String id, String fname, String lname, String mi, String person, String mail, String num, String add) {
-        String sql = " UPDATE supplier SET first_name = ?, last_name = ?, middle_initial = ?, contact_person = ?, phone_number = ?, email = ?, address = ? WHERE supplierID = ?";
+        String sql = "CALL update_supplier(?,?,?,?,?,?,?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -551,7 +551,7 @@ public class DatabaseHandler {
 
 
     public boolean updateInventory(String id, String quantity){
-        String sql = "UPDATE inventory SET stock_quantity = stock_quantity + ? WHERE inventoryID = ?";
+        String sql = "CALL stock_in(?,?)";
 
         try (Connection conn = Database.getConnection();
              PreparedStatement pstmt = conn.prepareStatement(sql)) {
@@ -559,8 +559,8 @@ public class DatabaseHandler {
             if(getQuantity < 0){
                 JOptionPane.showMessageDialog(null,"BOBO KABA!? Negative STOCK IN?");
             }else {
-                pstmt.setInt(1, getQuantity);
-                pstmt.setString(2, id);
+                pstmt.setString(1, id);
+                pstmt.setInt(2, getQuantity);
             }
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
