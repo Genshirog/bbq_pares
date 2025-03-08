@@ -4,13 +4,10 @@ import Back_end.*;
 import Back_end.MenuItem;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,8 +17,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CashierOrder implements OrderItem.OrderItemSelectionListener {
+    public SceneManager scene;
     private StackPane root;
-    private SceneManager scene;
     private VBox left_panel;
 
     // Menu items data
@@ -41,7 +38,6 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
         root.getStyleClass().add("root_form");
         root.getChildren().add(overlay());
         root.getChildren().add(contents());
-
     }
 
     public Scene getScene() {
@@ -52,6 +48,10 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
 
     public StackPane getRoot() {
         return root;
+    }
+
+    public Label getTotalLabel() {
+        return totalLabel;
     }
 
     private Pane overlay() {
@@ -236,7 +236,6 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
     }
     // Menu Item class
 
-    // Order Item class
     public OrderItem getSelectedOrderItem() {
         return selectedOrderItem;
     }
@@ -244,4 +243,5 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
     public void setSelectedOrderItem(OrderItem orderItem) {
         this.selectedOrderItem = orderItem;
     }
+
 }

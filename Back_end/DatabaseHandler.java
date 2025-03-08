@@ -1,11 +1,12 @@
 package Back_end;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.*;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -593,4 +594,169 @@ public class DatabaseHandler {
         return "";
     }
     // Add other methods for updating, deleting, and retrieving employees
+
+//CashierOrder methods
+public static ObservableList<MenuItem> getMenuItemsFromDatabase() {
+    ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
+
+    try {
+        Connection conn = Database.getConnection();
+        if (conn == null) {
+            System.out.println("Database connection is null!");
+            return menuItems;
+        }
+        System.out.println("Database connection established.");
+
+        // Join products and inventory tables to get all required fields
+        String sql = "SELECT DISTINCT p.ProductID AS code, p.ProductName AS name, p.Price AS price, " +
+                "i.availability AS availability, i.stock_quantity AS quantityAvailable " +
+                "FROM products p " +
+                "LEFT JOIN (SELECT ProductID, stock_quantity, availability " +
+                "           FROM inventory " +
+                "           WHERE (ProductID, stock_date) IN " +
+                "                 (SELECT ProductID, MAX(stock_date) " +
+                "                  FROM inventory " +
+                "                  GROUP BY ProductID)) i " +
+                "ON p.ProductID = i.ProductID";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        int rowCount = 0;
+        while (rs.next()) {
+            rowCount++;
+            String code = rs.getString("code");
+            String name = rs.getString("name");
+            double price = rs.getDouble("price");
+            String availability = rs.getString("availability");
+            int quantityAvailable = rs.getInt("quantityAvailable");
+
+            MenuItem menuItem = new MenuItem(code, name, price, quantityAvailable, availability);
+            menuItems.add(menuItem);
+            System.out.println("Added menu item: " + name + " (Code: " + code + ")");
+        }
+
+        System.out.println("Total rows fetched: " + rowCount);
+        conn.close();
+    } catch (Exception e) {
+        System.out.println("Error fetching menu items: " + e.getMessage());
+    }
+
+    return menuItems;
+}
+
+
+    public boolean saveOrder(String orderId, List<OrderItem> orderItems, double total) {
+        try {
+            Connection conn = Database.getConnection();
+
+            // Insert into orders table
+            String orderSql = "INSERT INTO orders (OrderID, order_description) VALUES (?, ?)";
+            PreparedStatement orderStmt = conn.prepareStatement(orderSql);
+            orderStmt.setString(1, orderId);
+            orderStmt.setString(2, "Customer Order");
+            orderStmt.executeUpdate();
+
+            // Insert order items
+            String itemSql = "INSERT INTO orderitems (OrderItemID, OrderID, item_name, item_quantity, item_price, total_price) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement itemStmt = conn.prepareStatement(itemSql);
+
+            int itemCount = 1;
+            for (OrderItem item : orderItems) {
+                String itemId = orderId + "-I" + String.format("%03d", itemCount++);
+                itemStmt.setString(1, itemId);
+                itemStmt.setString(2, orderId);
+                itemStmt.setString(3, item.getMenuItem().getName()); // Use getMenuItem().getName()
+                itemStmt.setInt(4, item.getQuantity()); // Use getQuantity()
+                itemStmt.setDouble(5, item.getMenuItem().getPrice()); // Use getMenuItem().getPrice()
+                itemStmt.setDouble(6, item.getTotal()); // Use getTotal() for total_price
+                itemStmt.executeUpdate();
+            }
+
+            conn.close();
+            return true;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
+    // order numbering, gettig the last int then increment by 1
+    public String getNextOrderId() {
+        String prefix = "ORD";
+        int nextNumber = 1; // Default starting value
+
+        try {
+            Connection conn = Database.getConnection();
+
+            // This query extracts numeric part after "ORD" and finds the maximum value
+            String sql = "SELECT MAX(CAST(SUBSTRING(OrderID, 4) AS UNSIGNED)) AS maxNum FROM orders WHERE OrderID LIKE 'ORD%'";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next() && rs.getString("maxNum") != null) {
+                nextNumber = rs.getInt("maxNum") + 1;
+            }
+
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error getting next order ID: " + e.getMessage());
+        }
+
+        // Create the new order ID with proper formatting
+        return prefix + String.format("%06d", nextNumber);
+    }
+//added this to fix the number having too many or random
+
+    // Get all orders with items
+    public List<OrderView> getOrders() {
+        List<OrderView> orders = new ArrayList<>();
+        String sql = "SELECT o.OrderID, oi.item_name, oi.item_quantity, oi.item_price, oi.total_price " +
+                "FROM orders o JOIN orderitems oi ON o.OrderID = oi.OrderID";
+        try {
+            Connection conn = Database.getConnection();
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                OrderView order = new OrderView(
+                        rs.getString("OrderID"),
+                        rs.getString("item_name"),
+                        rs.getInt("item_quantity"),
+                        rs.getDouble("item_price"),
+                        rs.getDouble("total_price")
+                );
+                orders.add(order);
+            }
+            conn.close();
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return orders;
+    }
+
+    // Delete order
+    public boolean deleteOrder(String orderId) {
+        try {
+            Connection conn = Database.getConnection();
+
+            // Delete order items first
+            String itemSql = "DELETE FROM orderitems WHERE OrderID = ?";
+            PreparedStatement itemStmt = conn.prepareStatement(itemSql);
+            itemStmt.setString(1, orderId);
+            itemStmt.executeUpdate();
+
+            // Delete order
+            String orderSql = "DELETE FROM orders WHERE OrderID = ?";
+            PreparedStatement orderStmt = conn.prepareStatement(orderSql);
+            orderStmt.setString(1, orderId);
+            int rowsAffected = orderStmt.executeUpdate();
+
+            conn.close();
+            return rowsAffected > 0;
+        } catch (Exception e) {
+            System.out.println(e.getMessage());
+            return false;
+        }
+    }
+
 }

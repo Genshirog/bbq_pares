@@ -3,9 +3,13 @@ package Back_end;
 import Front_end.CashierOrder;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
 import javafx.scene.layout.VBox;
 
 import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 public class CashierOrderHandler implements EventHandler<ActionEvent> {
     private OrderItem selectedOrderItem;
@@ -13,12 +17,15 @@ public class CashierOrderHandler implements EventHandler<ActionEvent> {
     private Map<String, OrderItem> orderItems;
     private VBox orderItemsBox;
     private String btn;
+    private DatabaseHandler dbHandler;
+
     public CashierOrderHandler(OrderItem selectedOrderItem, CashierOrder cashierOrder, Map<String, OrderItem> orderItems, VBox orderItemsBox, String btn) {
         this.selectedOrderItem = selectedOrderItem;
         this.cashierOrder = cashierOrder;
         this.orderItems = orderItems;
         this.orderItemsBox = orderItemsBox;
         this.btn = btn;
+        this.dbHandler = new DatabaseHandler();
     }
 
     @Override
@@ -26,6 +33,7 @@ public class CashierOrderHandler implements EventHandler<ActionEvent> {
         switch (btn){
             case "cancel":
                 System.out.println("Nigga1");
+                cashierOrder.scene.show_order_history();
                 break;
             case "reset":
                 orderItems.clear();
@@ -58,7 +66,34 @@ public class CashierOrderHandler implements EventHandler<ActionEvent> {
                 System.out.println("Nigga4");
                 break;
             case "confirm":
-                System.out.println("Nigga5");
+                if (orderItems.isEmpty()) {
+                    cashierOrder.showAlert("Please add items to the order first!");
+                    return;
+                }
+
+                Alert confirmAlert = new Alert(Alert.AlertType.CONFIRMATION);
+                confirmAlert.setTitle("Confirm Order");
+                confirmAlert.setHeaderText("Are you sure you want to confirm this order?");
+                Optional<ButtonType> result = confirmAlert.showAndWait();
+
+                if (result.isPresent() && result.get() == ButtonType.OK) {
+                    // Get the next sequential order ID instead of random
+                    String orderId = dbHandler.getNextOrderId();
+
+                    // Use the getter method for totalLabel
+                    boolean saved = dbHandler.saveOrder(orderId,
+                            new java.util.ArrayList<>(orderItems.values()),
+                            Double.parseDouble(cashierOrder.getTotalLabel().getText().replace("Total: ₱", "")));
+
+                    if (saved) {
+                        cashierOrder.showAlert("Order " + orderId + " saved successfully!");
+                        orderItems.clear();
+                        orderItemsBox.getChildren().clear();
+                        cashierOrder.updateTotal();
+                    } else {
+                        cashierOrder.showAlert("Failed to save order!");
+                    }
+                }
                 break;
         }
     }
