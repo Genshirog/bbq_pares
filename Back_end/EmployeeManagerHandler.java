@@ -7,7 +7,7 @@ import javafx.scene.layout.VBox;
 
 import javax.swing.*;
 import java.util.Map;
-
+//This is the employee-manager-handler this is the sub-backend of the system when a button is press it goes here to be process this is the request server
 public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Manager manager;
@@ -24,6 +24,7 @@ public class EmployeeManagerHandler implements EventHandler<ActionEvent> {
     public void handle(ActionEvent event){
         switch (btn){
             case "AddEmp":
+                //The data are being taken and sent to the database handler on the method add employee
                 Map<String,String> data = refreshable.getFormData();
                 boolean success = database.addEmployee(
                         data.get("id"),

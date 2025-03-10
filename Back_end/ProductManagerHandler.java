@@ -7,7 +7,7 @@ import javafx.scene.layout.VBox;
 
 import javax.swing.*;
 import java.util.Map;
-
+//This is the product-manager-handler this is the sub-backend of the system when a button is press it goes here to be process this is the request server
 public class ProductManagerHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Manager manager;

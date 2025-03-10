@@ -9,6 +9,11 @@ import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
+/*
+* This is the database handler. It is the main backend of the system created to return the data the front-end is fetching.
+* It also handles the hashing of the passwords and uses preparedStatement to prevent SQL injections.
+* This class handles the CRUD data, the display on the tables, as well as the verification of credentials.
+* */
 public class DatabaseHandler {
     private Formatter builder;
     public  DatabaseHandler(){

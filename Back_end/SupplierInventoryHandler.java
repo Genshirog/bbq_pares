@@ -4,7 +4,7 @@ import Front_end.*;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.layout.VBox;
-
+//This is the supplier-inventory-handler this is the sub-backend of the system when a button is press it goes here to be process this is the request server
 public class SupplierInventoryHandler implements EventHandler<ActionEvent> {
     private final String btn;
     private Inventory inventory;

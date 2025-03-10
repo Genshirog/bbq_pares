@@ -166,6 +166,7 @@ public class EmployeeManager implements Refreshable {
         return employeeCombo();
     }
 
+    //This stores the data to the hashmap which id being called to the handlers
     @Override
     public Map<String, String> getFormData() {
         Map<String, String> data = new HashMap<>();
