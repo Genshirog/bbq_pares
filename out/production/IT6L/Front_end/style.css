@@ -424,7 +424,7 @@
 
 .menu-container {
     -fx-background-color: rgba(255, 255, 255, 0.8);
-    -fx-padding: 15px;
+    -fx-padding: 20px;
     -fx-background-radius: 10px;
     -fx-alignment: center-left;
 }
@@ -493,3 +493,57 @@
     -fx-border-width: 2px;
     -fx-text-fill: black;
 }
+
+
+/*CancelOrder STYLE*/
+.cancellation-layout {
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 0);
+}
+
+/* HBox containing the Order ID label and fetch button */
+.cancellation-orderid-box {
+    -fx-background-color: transparent;
+    -fx-padding: 50px;
+    -fx-spacing: 10px;
+}
+
+.cancellation-textfield {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+}
+
+/* Label for "Order ID:" */
+.cancellation-label {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #FFFFFF;
+}
+
+/* VBox containing the order items*/
+.cancellation-items-box {
+    -fx-background-color: rgba(245, 245, 245, 0.9);
+    -fx-pref-width: 800px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+/* Total label */
+.cancellation-total-label {
+    -fx-background-color: rgba(245, 245, 245, 0.9);
+    -fx-padding: 5px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
+}
+
+/* HBox containing the Cancel and Back buttons */
+.cancellation-button-box {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
+}
+

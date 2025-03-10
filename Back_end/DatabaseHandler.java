@@ -1,11 +1,12 @@
 package Back_end;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+
+import java.sql.*;
 import java.util.Base64;
 import java.nio.charset.StandardCharsets;
 import javax.swing.*;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -598,4 +599,280 @@ public class DatabaseHandler {
         return "";
     }
     // Add other methods for updating, deleting, and retrieving employees
+
+//CashierOrder methods
+public static ObservableList<MenuItem> getMenuItemsFromDatabase() {
+    ObservableList<MenuItem> menuItems = FXCollections.observableArrayList();
+
+    try {
+        Connection conn = Database.getConnection();
+        if (conn == null) {
+            System.out.println("Database connection is null!");
+            return menuItems;
+        }
+        System.out.println("Database connection established.");
+
+        // Join products and inventory tables to get all required fields
+        String sql = "SELECT DISTINCT p.ProductID AS code, p.ProductName AS name, p.Price AS price, " +
+                "i.availability AS availability, i.stock_quantity AS quantityAvailable " +
+                "FROM products p " +
+                "LEFT JOIN (SELECT ProductID, stock_quantity, availability " +
+                "           FROM inventory " +
+                "           WHERE (ProductID, stock_date) IN " +
+                "                 (SELECT ProductID, MAX(stock_date) " +
+                "                  FROM inventory " +
+                "                  GROUP BY ProductID)) i " +
+                "ON p.ProductID = i.ProductID";
+        PreparedStatement stmt = conn.prepareStatement(sql);
+        ResultSet rs = stmt.executeQuery();
+
+        int rowCount = 0;
+        while (rs.next()) {
+            rowCount++;
+            String code = rs.getString("code");
+            String name = rs.getString("name");
+            double price = rs.getDouble("price");
+            String availability = rs.getString("availability");
+            int quantityAvailable = rs.getInt("quantityAvailable");
+
+            MenuItem menuItem = new MenuItem(code, name, price, quantityAvailable, availability);
+            menuItems.add(menuItem);
+            System.out.println("Added menu item: " + name + " (Code: " + code + ")");
+        }
+
+        System.out.println("Total rows fetched: " + rowCount);
+        conn.close();
+    } catch (Exception e) {
+        System.out.println("Error fetching menu items: " + e.getMessage());
+    }
+
+    return menuItems;
 }
+
+
+//saving order
+    private String getNextOrderItemIdBase() {
+        String prefix = "OI";
+        int nextNumber = 1;
+
+        try {
+            Connection conn = Database.getConnection();
+            String sql = "SELECT MAX(CAST(SUBSTRING(OrderItemID, 3) AS UNSIGNED)) AS maxNum FROM orderitems WHERE OrderItemID LIKE 'OI%'";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next() && rs.getString("maxNum") != null) {
+                nextNumber = rs.getInt("maxNum") + 1;
+            }
+
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error getting next order item ID base: " + e.getMessage());
+        }
+
+        return prefix + String.format("%03d", nextNumber);
+    }
+
+    // Updated saveOrder method
+    public boolean saveOrder(String orderId, List<OrderItem> orderItems, double total, String orderDescription, String paymentMethod) {
+        Connection conn = null;
+        try {
+            conn = Database.getConnection();
+            if (conn == null) {
+                throw new SQLException("Failed to establish database connection");
+            }
+            conn.setAutoCommit(false);
+
+            String safeOrderDescription = (orderDescription != null && !orderDescription.trim().isEmpty())
+                    ? orderDescription
+                    : "No Description";
+            System.out.println("Safe Order Description in saveOrder: " + safeOrderDescription);
+
+            // Insert into orders table
+            String orderSql = "INSERT INTO orders (OrderID, order_description) VALUES (?, ?)";
+            try (PreparedStatement orderStmt = conn.prepareStatement(orderSql)) {
+                orderStmt.setString(1, orderId);
+                orderStmt.setString(2, safeOrderDescription);
+                System.out.println("Executing SQL: " + orderSql + " with OrderID=" + orderId + ", order_description=" + safeOrderDescription);
+                orderStmt.executeUpdate();
+            }
+
+            // Insert order items
+            String itemSql = "INSERT INTO orderitems (OrderItemID, OrderID, item_name, item_quantity, item_price, total_price) VALUES (?, ?, ?, ?, ?, ?)";
+            PreparedStatement itemStmt = null;
+            try {
+                itemStmt = conn.prepareStatement(itemSql);
+                String baseItemId = getNextOrderItemIdBase();
+                int baseNumber = Integer.parseInt(baseItemId.substring(2));
+                for (int i = 0; i < orderItems.size(); i++) {
+                    OrderItem item = orderItems.get(i);
+                    String itemId = "OI" + String.format("%03d", baseNumber + i);
+                    itemStmt.setString(1, itemId);
+                    itemStmt.setString(2, orderId);
+                    itemStmt.setString(3, item.getMenuItem().getName());
+                    itemStmt.setInt(4, item.getQuantity());
+                    itemStmt.setDouble(5, item.getMenuItem().getPrice());
+                    itemStmt.setDouble(6, item.getTotal());
+                    itemStmt.executeUpdate();
+                }
+            } finally {
+                if (itemStmt != null) itemStmt.close();
+            }
+
+            // Insert into receipt (remove this if the trigger should handle it)
+            String receiptSql = "INSERT INTO receipt (ReceiptID, OrderID, price, payment_method, receipt_date, order_description) VALUES (?, ?, ?, ?, NOW(), ?)";
+            try (PreparedStatement receiptStmt = conn.prepareStatement(receiptSql)) {
+                receiptStmt.setString(1, "R" + orderId.substring(3));
+                receiptStmt.setString(2, orderId);
+                receiptStmt.setDouble(3, total);
+                receiptStmt.setString(4, paymentMethod);
+                receiptStmt.setString(5, safeOrderDescription);
+                receiptStmt.executeUpdate();
+            }
+
+            conn.commit();
+            System.out.println("Order " + orderId + " saved successfully");
+            return true;
+
+        } catch (Exception e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
+                }
+            }
+            System.err.println("Error saving order: " + e.getMessage());
+            // Log table structures for debugging
+            if (conn != null) {
+                try (Statement stmt = conn.createStatement()) {
+                    System.out.println("Orders table structure:");
+                    try (ResultSet rs = stmt.executeQuery("DESCRIBE orders")) {
+                        while (rs.next()) {
+                            System.out.println(rs.getString("Field") + " | " + rs.getString("Type") + " | " + rs.getString("Null") + " | " + rs.getString("Default"));
+                        }
+                    }
+                    System.out.println("Receipt table structure:");
+                    try (ResultSet rs = stmt.executeQuery("DESCRIBE receipt")) {
+                        while (rs.next()) {
+                            System.out.println(rs.getString("Field") + " | " + rs.getString("Type") + " | " + rs.getString("Null") + " | " + rs.getString("Default"));
+                        }
+                    }
+                } catch (SQLException describeEx) {
+                    System.err.println("Failed to describe tables: " + describeEx.getMessage());
+                }
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Failed to close connection: " + closeEx.getMessage());
+                }
+            }
+        }
+    }
+
+    // order numbering, getting the last int then increment by 1
+    public String getNextOrderId() {
+        String prefix = "ORD";
+        int nextNumber = 1; // Default starting value
+
+        try {
+            Connection conn = Database.getConnection();
+            // Extract the numeric part after "ORD" and find the maximum value
+            String sql = "SELECT MAX(CAST(SUBSTRING(OrderID, 4) AS UNSIGNED)) AS maxNum FROM orders WHERE OrderID LIKE 'ORD%'";
+            PreparedStatement stmt = conn.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next() && rs.getString("maxNum") != null) {
+                nextNumber = rs.getInt("maxNum") + 1;
+            }
+
+            conn.close();
+        } catch (SQLException e) {
+            System.err.println("Error getting next order ID: " + e.getMessage());
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        // Create the new order ID with proper formatting
+        return prefix + String.format("%03d", nextNumber);
+    }
+//added this to fix the number having too many or random
+    public List<OrderItem> getOrderItemsByOrderId(String orderId) throws Exception {
+        List<OrderItem> items = new ArrayList<>();
+        String sql = "SELECT oi.OrderItemID, oi.item_name, oi.item_quantity, oi.item_price, oi.total_price " +
+                "FROM orderitems oi WHERE oi.OrderID = ?";
+        try (Connection conn = Database.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, orderId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                String itemName = rs.getString("item_name");
+                int quantity = rs.getInt("item_quantity");
+                double price = rs.getDouble("item_price");
+                double total = rs.getDouble("total_price");
+                // Create a dummy MenuItem for compatibility with OrderItem constructor
+                MenuItem menuItem = new MenuItem("", itemName, price); // Adjust constructor if needed
+                OrderItem item = new OrderItem(menuItem, (OrderItem.OrderItemSelectionListener) null); // Pass null listener
+                item.setQuantity(quantity);
+                item.updateTotal(); // Ensure total matches fetched value (optional sync)
+                items.add(item);
+            }
+        } catch (SQLException e) {
+            System.err.println("Error fetching order items: " + e.getMessage());
+        }
+        return items;
+    }
+
+    // ADD THIS TO DatabaseHandler.java: Method to cancel an order
+    public boolean cancelOrder(String orderId) throws Exception {
+        Connection conn = null;
+        try {
+            conn = Database.getConnection();
+            conn.setAutoCommit(false);
+
+            // Delete from orderitems table
+            String deleteItemsSql = "DELETE FROM orderitems WHERE OrderID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteItemsSql)) {
+                stmt.setString(1, orderId);
+                stmt.executeUpdate();
+            }
+
+            // Delete from orders table
+            String deleteOrderSql = "DELETE FROM orders WHERE OrderID = ?";
+            try (PreparedStatement stmt = conn.prepareStatement(deleteOrderSql)) {
+                stmt.setString(1, orderId);
+                stmt.executeUpdate();
+            }
+
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch (SQLException rollbackEx) {
+                    System.err.println("Rollback failed: " + rollbackEx.getMessage());
+                }
+            }
+            System.err.println("Error canceling order: " + e.getMessage());
+            return false;
+        } finally {
+            if (conn != null) {
+                try {
+                    conn.setAutoCommit(true);
+                    conn.close();
+                } catch (SQLException closeEx) {
+                    System.err.println("Failed to close connection: " + closeEx.getMessage());
+                }
+            }
+        }
+    }
+
+}
+

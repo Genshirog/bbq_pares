@@ -46,6 +46,14 @@ public class OrderItem {
         });
     }
 
+    public MenuItem getMenuItem() {
+        return menuItem;
+    }
+
+    public void setMenuItem(MenuItem menuItem) {
+        this.menuItem = menuItem;
+    }
+
     public void setSelected(boolean selected) {
         if (selected) {
             container.getStyleClass().remove("order-item");

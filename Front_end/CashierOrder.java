@@ -4,24 +4,22 @@ import Back_end.*;
 import Back_end.MenuItem;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.effect.Glow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.util.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class CashierOrder implements OrderItem.OrderItemSelectionListener {
+    public SceneManager scene;
     private StackPane root;
-    private SceneManager scene;
     private VBox left_panel;
 
     // Menu items data
@@ -34,14 +32,26 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
     // Currently selected order item (for removal)
     private OrderItem selectedOrderItem = null;
 
+    private String currentOrderId; // Added to track OrderID
+    private DatabaseHandler databaseHandler; // Added to handle OrderID generation
+
+    private TextField orderIdField;
+    private boolean isCancellationMode = false;
+
     public CashierOrder(SceneManager scene) {
         this.scene = scene;
         this.tableManager = new TableManager();
+        this.databaseHandler = new DatabaseHandler();
         root = new StackPane();
         root.getStyleClass().add("root_form");
         root.getChildren().add(overlay());
         root.getChildren().add(contents());
-
+        try {
+            this.currentOrderId = databaseHandler.getNextOrderId();
+        } catch (Exception e) {
+            System.err.println("Error fetching next Order ID: " + e.getMessage());
+            this.currentOrderId = "ORD001"; // Fallback value
+        }
     }
 
     public Scene getScene() {
@@ -52,6 +62,10 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
 
     public StackPane getRoot() {
         return root;
+    }
+
+    public Label getTotalLabel() {
+        return totalLabel;
     }
 
     private Pane overlay() {
@@ -79,7 +93,7 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
         paresLabel.getStyleClass().add("section-label");
 
         // Create menu table
-        leftContainer.getChildren().addAll(paresLabel,tableManager.setupMenuTable(this) );
+        leftContainer.getChildren().addAll(paresLabel, tableManager.setupMenuTable(this));
 
         // Right container for order summary
         VBox rightContainer = createRightPanel();
@@ -91,7 +105,7 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
     }
 
     private VBox createRightPanel() {
-        VBox rightContainer = new VBox(10);
+        VBox rightContainer = new VBox(15);
         rightContainer.getStyleClass().add("order-container");
 
         // Order summary title
@@ -104,7 +118,7 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
         orderItemsBox.setPadding(new Insets(10, 0, 10, 0));
         ScrollPane scrollPane = new ScrollPane(orderItemsBox);
         scrollPane.setFitToWidth(true);
-        scrollPane.setPrefHeight(400);
+        scrollPane.setPrefHeight(300);
         scrollPane.getStyleClass().add("order-scroll");
 
         // Total amount
@@ -157,7 +171,7 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
     }
 
     private VBox buttonContainer() {
-        VBox buttonContainer = new VBox(20);
+        VBox buttonContainer = new VBox(10);
         buttonContainer.getStyleClass().add("btncontainer");
 
         // Create buttons
@@ -173,12 +187,12 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
         cancelBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
         backBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
 
-        cancelBtn.setOnAction(new CashierOrderHandler(selectedOrderItem,this,orderItems,orderItemsBox,"cancel"));
-        confirmBtn.setOnAction(new CashierOrderHandler(selectedOrderItem,this,orderItems,orderItemsBox,"confirm"));
-        resetBtn.setOnAction(new CashierOrderHandler(selectedOrderItem,this,orderItems,orderItemsBox,"reset"));
-        removeBtn.setOnAction(new CashierOrderHandler(selectedOrderItem,this,orderItems,orderItemsBox,"remove"));
-        backBtn.setOnAction(new CashierOrderHandler(selectedOrderItem,this,orderItems,orderItemsBox,"back"));
-        // Add button actionS
+        cancelBtn.setOnAction(new CashierOrderHandler(selectedOrderItem, this, orderItems, orderItemsBox, "cancel"));
+        confirmBtn.setOnAction(new CashierOrderHandler(selectedOrderItem, this, orderItems, orderItemsBox, "confirm"));
+        resetBtn.setOnAction(new CashierOrderHandler(selectedOrderItem, this, orderItems, orderItemsBox, "reset"));
+        removeBtn.setOnAction(new CashierOrderHandler(selectedOrderItem, this, orderItems, orderItemsBox, "remove"));
+        backBtn.setOnAction(new CashierOrderHandler(selectedOrderItem, this, orderItems, orderItemsBox, "back"));
+        // Add button actions
 
         buttonContainer.getChildren().addAll(confirmBtn, resetBtn, removeBtn, cancelBtn, backBtn);
         return buttonContainer;
@@ -203,7 +217,7 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
             orderItem.updateLabel();
         } else {
             // New item, add to order
-            OrderItem orderItem = new OrderItem(menuItem,this);
+            OrderItem orderItem = new OrderItem(menuItem, this);
             orderItems.put(key, orderItem);
             orderItemsBox.getChildren().add(orderItem.getContainer());
         }
@@ -220,7 +234,7 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
         totalLabel.setText(String.format("Total: ₱%.2f", totalAmount));
     }
 
-    public double resetTotal(){
+    public double resetTotal() {
         return 0.0;
     }
 
@@ -234,14 +248,160 @@ public class CashierOrder implements OrderItem.OrderItemSelectionListener {
         selectedOrderItem = orderItem;
         selectedOrderItem.setSelected(true);
     }
-    // Menu Item class
 
-    // Order Item class
     public OrderItem getSelectedOrderItem() {
         return selectedOrderItem;
     }
 
     public void setSelectedOrderItem(OrderItem orderItem) {
         this.selectedOrderItem = orderItem;
+    }
+
+    // --- ADDED FOR ORDERCANCELLATIONHANDLER INTEGRATION ---
+    public String getCurrentOrderId() {
+        return currentOrderId; // Return the current OrderID
+    }
+
+    public void setCurrentOrderId(String currentOrderId) {
+        this.currentOrderId = currentOrderId;
+    }
+
+    public VBox getOrderItemsBox() {
+        return orderItemsBox;
+    }
+
+    public Map<String, OrderItem> getOrderItems() {
+        return orderItems;
+    }
+
+    public void clearOrder() {
+        orderItemsBox.getChildren().clear();
+        orderItems.clear();
+        totalLabel.setText("Total: ₱0.00");
+        selectedOrderItem = null;
+        try {
+            currentOrderId = databaseHandler.getNextOrderId();
+        } catch (Exception e) {
+            System.err.println("Error fetching next Order ID: " + e.getMessage());
+            currentOrderId = "ORD001"; // Fallback value
+        }
+    }
+
+    public void showOrderCancellation() {
+        if (!isCancellationMode) {
+            isCancellationMode = true;
+            root.getChildren().clear();
+            root.getChildren().add(overlay());
+
+            VBox cancellationLayout = new VBox(15);
+            cancellationLayout.setAlignment(Pos.CENTER);
+            cancellationLayout.setPadding(new Insets(20));
+            cancellationLayout.getStyleClass().add("cancellation-layout");
+
+            // Order ID input
+            HBox orderIdBox = new HBox(10);
+            orderIdBox.setAlignment(Pos.CENTER);
+            orderIdBox.getStyleClass().add("cancellation-orderid-box");
+            Label orderIdLabel = new Label("Order ID:");
+            orderIdLabel.getStyleClass().add("cancellation-label");
+            orderIdField = new TextField();
+            orderIdField.setPromptText("Enter OrderID here");
+            orderIdField.getStyleClass().add("cancellation-textfield");
+            orderIdField.getStyleClass().addAll("textfield-1", "border-radius", "background-radius");
+            Button fetchButton = new Button("FETCH ORDER");
+            fetchButton.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
+            fetchButton.setOnAction(e -> fetchOrder());
+            orderIdBox.getChildren().addAll(orderIdLabel, orderIdField, fetchButton);
+
+            // Order items area (reusing orderItemsBox)
+            orderItemsBox.getChildren().clear();
+            orderItemsBox.getStyleClass().add("cancellation-items-box");
+
+            ScrollPane scrollPane = new ScrollPane(orderItemsBox);
+            scrollPane.setFitToWidth(true);
+            scrollPane.setPrefHeight(200);
+            scrollPane.getStyleClass().add("order-scroll");
+
+            // Total label
+            totalLabel.setText("TOTAL:");
+            totalLabel.getStyleClass().add("total-label");
+            totalLabel.getStyleClass().add("cancellation-total-label");
+
+
+            // Buttons
+            HBox buttonBox = new HBox(10);
+            buttonBox.setAlignment(Pos.CENTER);
+            buttonBox.getStyleClass().add("cancellation-button-box");
+            Button cancelOrderBtn = new Button("CANCEL ORDER");
+            Button backBtn = new Button("BACK");
+            cancelOrderBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
+            backBtn.getStyleClass().addAll("btn-1", "background-radius-1", "border-radius");
+            cancelOrderBtn.setOnAction(e -> cancelOrder());
+            backBtn.setOnAction(e -> revertToOrderMode());
+            buttonBox.getChildren().addAll(cancelOrderBtn, backBtn);
+
+            cancellationLayout.getChildren().addAll(orderIdBox, scrollPane, totalLabel, buttonBox);
+            root.getChildren().add(cancellationLayout);
+        }
+    }
+    // MODIFY THIS IN CashierOrder.java: Handle exception within fetchOrder instead of rethrowing
+    private void fetchOrder() {
+        String orderId = orderIdField.getText().trim();
+        if (orderId.isEmpty()) {
+            showAlert("Please enter an Order ID.");
+            return;
+        }
+
+        List<OrderItem> items = null;
+        try {
+            items = databaseHandler.getOrderItemsByOrderId(orderId);
+        } catch (Exception e) {
+            showAlert("Failed to fetch order: " + e.getMessage());
+            System.err.println("Error fetching order items: " + e.getMessage());
+            return;
+        }
+
+        if (items.isEmpty()) {
+            showAlert("No order found with Order ID: " + orderId);
+            return;
+        }
+
+        orderItemsBox.getChildren().clear();
+        for (OrderItem item : items) {
+            orderItemsBox.getChildren().add(item.getContainer()); // Use existing container
+        }
+
+        double total = items.stream().mapToDouble(OrderItem::getTotal).sum();
+        totalLabel.setText(String.format("TOTAL: ₱%.2f", total));
+    }
+
+    private void cancelOrder() {
+        String orderId = orderIdField.getText().trim();
+        if (orderId.isEmpty()) {
+            showAlert("Please enter an Order ID.");
+            return;
+        }
+
+        boolean success = false;
+        try {
+            success = databaseHandler.cancelOrder(orderId);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+        if (success) {
+            showAlert("Order " + orderId + " has been successfully canceled.");
+            orderItemsBox.getChildren().clear();
+            totalLabel.setText("TOTAL: ₱0.00");
+            orderIdField.clear();
+        } else {
+            showAlert("Failed to cancel order " + orderId + ".");
+        }
+    }
+
+    private void revertToOrderMode() {
+        isCancellationMode = false;
+        root.getChildren().clear();
+        root.getChildren().add(overlay());
+        root.getChildren().add(contents());
     }
 }
