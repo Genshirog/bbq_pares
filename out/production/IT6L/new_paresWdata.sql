@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 07, 2025 at 03:12 PM
+-- Generation Time: Mar 09, 2025 at 09:47 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -451,8 +451,8 @@ CREATE TABLE `menu_view` (
 --
 
 CREATE TABLE `orderitems` (
-  `OrderItemID` varchar(10) NOT NULL,
-  `OrderID` varchar(10) NOT NULL,
+  `OrderItemID` varchar(15) NOT NULL,
+  `OrderID` varchar(15) NOT NULL,
   `item_name` varchar(60) NOT NULL,
   `item_quantity` int(11) NOT NULL,
   `item_price` decimal(10,2) NOT NULL,
@@ -630,7 +630,7 @@ DELIMITER ;
 --
 
 CREATE TABLE `orders` (
-  `OrderID` varchar(10) NOT NULL,
+  `OrderID` varchar(15) NOT NULL,
   `order_date` date DEFAULT NULL,
   `order_description` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -748,14 +748,14 @@ CREATE TABLE `products` (
   `ProductName` varchar(60) NOT NULL,
   `Price` decimal(10,2) NOT NULL,
   `Cost` decimal(10,2) NOT NULL,
-  `SupplierID` varchar(60) NOT NULL
+  `supplierID` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`ProductID`, `ProductName`, `Price`, `Cost`, `SupplierID`) VALUES
+INSERT INTO `products` (`ProductID`, `ProductName`, `Price`, `Cost`, `supplierID`) VALUES
 ('P001', 'PARES', 80.00, 56.00, 'S001'),
 ('P002', 'Beef PARES', 80.00, 56.00, 'S002'),
 ('P003', 'OVERLOAD PARES', 100.00, 70.00, 'S003'),
@@ -837,8 +837,8 @@ CREATE TABLE `product_view` (
 --
 
 CREATE TABLE `receipt` (
-  `ReceiptID` varchar(10) NOT NULL,
-  `OrderID` varchar(10) NOT NULL,
+  `ReceiptID` varchar(15) NOT NULL,
+  `OrderID` varchar(15) NOT NULL,
   `price` decimal(10,2) DEFAULT NULL,
   `payment_method` varchar(20) NOT NULL,
   `receipt_date` date NOT NULL
@@ -932,7 +932,7 @@ INSERT INTO `receipt` (`ReceiptID`, `OrderID`, `price`, `payment_method`, `recei
 --
 
 CREATE TABLE `supplier` (
-  `supplierID` varchar(10) NOT NULL,
+  `supplierID` varchar(15) NOT NULL,
   `first_name` varchar(60) NOT NULL,
   `last_name` varchar(60) NOT NULL,
   `middle_initial` varchar(1) NOT NULL,
@@ -1005,7 +1005,7 @@ INSERT INTO `supplier` (`supplierID`, `first_name`, `last_name`, `middle_initial
 -- (See below for the actual view)
 --
 CREATE TABLE `supplier_view` (
-`supplierID` varchar(10)
+`supplierID` varchar(15)
 ,`supplierName` varchar(125)
 ,`contact_person` varchar(60)
 ,`address` varchar(60)
@@ -1075,7 +1075,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `inventory_view`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory_view`  AS SELECT `i`.`InventoryID` AS `InventoryID`, `p`.`ProductName` AS `ProductName`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierName`, `i`.`stock_quantity` AS `stock_quantity`, `i`.`stock_date` AS `stock_date`, `i`.`availability` AS `availability` FROM ((`inventory` `i` join `products` `p` on(`i`.`ProductID` = `p`.`ProductID`)) join `supplier` `s` on(`p`.`SupplierID` = `s`.`supplierID`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory_view`  AS SELECT `i`.`InventoryID` AS `InventoryID`, `p`.`ProductName` AS `ProductName`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierName`, `i`.`stock_quantity` AS `stock_quantity`, `i`.`stock_date` AS `stock_date`, `i`.`availability` AS `availability` FROM ((`inventory` `i` join `products` `p` on(`i`.`ProductID` = `p`.`ProductID`)) join `supplier` `s` on(`p`.`supplierID` = `s`.`supplierID`)) ;
 
 -- --------------------------------------------------------
 
@@ -1102,7 +1102,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `product_view`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `product_view`  AS SELECT `p`.`ProductID` AS `ProductID`, `p`.`ProductName` AS `ProductName`, `p`.`Price` AS `Price`, `p`.`Cost` AS `Cost`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierID` FROM (`products` `p` join `supplier` `s` on(`p`.`SupplierID` = `s`.`supplierID`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `product_view`  AS SELECT `p`.`ProductID` AS `ProductID`, `p`.`ProductName` AS `ProductName`, `p`.`Price` AS `Price`, `p`.`Cost` AS `Cost`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierID` FROM (`products` `p` join `supplier` `s` on(`p`.`supplierID` = `s`.`supplierID`)) ;
 
 -- --------------------------------------------------------
 
@@ -1178,7 +1178,7 @@ ALTER TABLE `ordersupply`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`ProductID`),
-  ADD KEY `fk_suppler_id` (`SupplierID`);
+  ADD KEY `fk_suppler_id` (`supplierID`);
 
 --
 -- Indexes for table `supplier`
@@ -1222,7 +1222,7 @@ ALTER TABLE `inventory`
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
-  ADD CONSTRAINT `fk_suppler_id` FOREIGN KEY (`SupplierID`) REFERENCES `supplier` (`supplierID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_suppler_id` FOREIGN KEY (`supplierID`) REFERENCES `supplier` (`supplierID`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

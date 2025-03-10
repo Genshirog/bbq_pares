@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Mar 07, 2025 at 03:12 PM
+-- Generation Time: Mar 10, 2025 at 08:46 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -257,12 +257,12 @@ CREATE TABLE `inventory` (
 --
 
 INSERT INTO `inventory` (`InventoryID`, `ProductID`, `stock_quantity`, `stock_date`, `availability`) VALUES
-(57, 'P001', 50, '2025-03-07', 'Available'),
-(58, 'P002', 40, '2025-03-07', 'Available'),
-(59, 'P003', 30, '2025-03-07', 'Available'),
-(60, 'P004', 20, '2025-03-07', 'Available'),
-(61, 'P005', 15, '2025-03-07', 'Available'),
-(62, 'P006', 25, '2025-03-07', 'Available'),
+(57, 'P001', 48, '2025-03-07', 'Available'),
+(58, 'P002', 38, '2025-03-07', 'Available'),
+(59, 'P003', 28, '2025-03-07', 'Available'),
+(60, 'P004', 18, '2025-03-07', 'Available'),
+(61, 'P005', 14, '2025-03-07', 'Available'),
+(62, 'P006', 24, '2025-03-07', 'Available'),
 (63, 'P007', 35, '2025-03-07', 'Available'),
 (64, 'P008', 45, '2025-03-07', 'Available'),
 (65, 'P009', 10, '2025-03-07', 'Available'),
@@ -280,7 +280,7 @@ INSERT INTO `inventory` (`InventoryID`, `ProductID`, `stock_quantity`, `stock_da
 (77, 'P021', 10, '2025-03-07', 'Available'),
 (78, 'P022', 5, '2025-03-07', 'Available'),
 (79, 'P023', 0, '2025-03-07', 'Not Available'),
-(80, 'P024', 8, '2025-03-07', 'Available'),
+(80, 'P024', 10, '2025-03-07', 'Available'),
 (81, 'P025', 100, '2025-03-07', 'Available'),
 (82, 'P026', 45, '2025-03-07', 'Available'),
 (83, 'P027', 50, '2025-03-07', 'Available'),
@@ -451,8 +451,8 @@ CREATE TABLE `menu_view` (
 --
 
 CREATE TABLE `orderitems` (
-  `OrderItemID` varchar(10) NOT NULL,
-  `OrderID` varchar(10) NOT NULL,
+  `OrderItemID` varchar(15) NOT NULL,
+  `OrderID` varchar(15) NOT NULL,
   `item_name` varchar(60) NOT NULL,
   `item_quantity` int(11) NOT NULL,
   `item_price` decimal(10,2) NOT NULL,
@@ -478,7 +478,9 @@ INSERT INTO `orderitems` (`OrderItemID`, `OrderID`, `item_name`, `item_quantity`
 ('OI012', 'ORD006', 'ATAY', 2, 15.00, 30.00),
 ('OI013', 'ORD007', 'PAA', 2, 85.00, 170.00),
 ('OI014', 'ORD007', 'POUL', 3, 15.00, 45.00),
+('OI0149', 'ORD075', 'PARES', 1, 80.00, 80.00),
 ('OI015', 'ORD008', 'PETCHO', 1, 85.00, 85.00),
+('OI0150', 'ORD075', 'RICE', 2, 15.00, 30.00),
 ('OI016', 'ORD008', 'BAT', 4, 15.00, 60.00),
 ('OI017', 'ORD009', 'CHOT', 2, 85.00, 170.00),
 ('OI018', 'ORD009', 'ISAW', 5, 10.00, 50.00),
@@ -612,12 +614,42 @@ INSERT INTO `orderitems` (`OrderItemID`, `OrderID`, `item_name`, `item_quantity`
 ('OI146', 'ORD073', 'RICE', 3, 15.00, 45.00),
 ('OI147', 'ORD074', 'PANGAS', 2, 150.00, 300.00),
 ('OI148', 'ORD074', 'KASALO', 2, 40.00, 80.00),
-('OI149', 'ORD075', 'PUSIT', 1, 150.00, 150.00),
-('OI150', 'ORD075', 'PARES Extra', 2, 85.00, 170.00);
+('OI149', 'ORD075', 'PARES', 1, 80.00, 80.00),
+('OI150', 'ORD075', 'RICE', 2, 15.00, 30.00);
 
 --
 -- Triggers `orderitems`
 --
+DELIMITER $$
+CREATE TRIGGER `reduce_inventory_after_order` AFTER INSERT ON `orderitems` FOR EACH ROW BEGIN
+    DECLARE latest_stock_date DATE;
+    DECLARE product_id VARCHAR(60);
+
+    -- Find the ProductID for the item_name
+    SELECT ProductID INTO product_id 
+    FROM products 
+    WHERE ProductName = NEW.item_name 
+    LIMIT 1;
+
+    -- Get the latest stock date for this product
+    SELECT MAX(stock_date) INTO latest_stock_date 
+    FROM inventory 
+    WHERE ProductID = product_id;
+
+    -- Update the stock quantity for the latest entry
+    UPDATE inventory 
+    SET stock_quantity = stock_quantity - NEW.item_quantity
+    WHERE ProductID = product_id 
+    AND stock_date = latest_stock_date;
+
+    -- Optional: Prevent negative stock (remove if not needed)
+    IF (SELECT stock_quantity FROM inventory WHERE ProductID = product_id AND stock_date = latest_stock_date) < 0 THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Insufficient stock for product!';
+    END IF;
+END
+$$
+DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `total_pricing` BEFORE INSERT ON `orderitems` FOR EACH ROW SET NEW.total_price = NEW.item_quantity * NEW.item_price
 $$
@@ -630,95 +662,115 @@ DELIMITER ;
 --
 
 CREATE TABLE `orders` (
-  `OrderID` varchar(10) NOT NULL,
+  `OrderID` varchar(15) NOT NULL,
   `order_date` date DEFAULT NULL,
-  `order_description` text NOT NULL
+  `status` varchar(20) DEFAULT 'Active',
+  `order_description` varchar(255) NOT NULL DEFAULT 'No Description'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `orders`
 --
 
-INSERT INTO `orders` (`OrderID`, `order_date`, `order_description`) VALUES
-('ORD001', '2025-03-07', 'Customer order for dine-in'),
-('ORD002', '2025-03-07', 'Takeout order'),
-('ORD003', '2025-03-07', 'Large group order'),
-('ORD004', '2025-03-07', 'Quick meal order'),
-('ORD005', '2025-03-07', 'Family pack order'),
-('ORD006', '2025-03-07', 'Solo meal order'),
-('ORD007', '2025-03-07', 'Lunch special order'),
-('ORD008', '2025-03-07', 'Dinner order'),
-('ORD009', '2025-03-07', 'Breakfast order'),
-('ORD010', '2025-03-07', 'Snack order'),
-('ORD011', '2025-03-07', 'Bulk order'),
-('ORD012', '2025-03-07', 'Party order'),
-('ORD013', '2025-03-07', 'Regular customer order'),
-('ORD014', '2025-03-07', 'Special request order'),
-('ORD015', '2025-03-07', 'Custom combo order'),
-('ORD016', '2025-03-07', 'Quick pickup order'),
-('ORD017', '2025-03-07', 'Group meal order'),
-('ORD018', '2025-03-07', 'Individual order'),
-('ORD019', '2025-03-07', 'Event catering order'),
-('ORD020', '2025-03-07', 'Takeout combo order'),
-('ORD021', '2025-03-07', 'Dine-in family order'),
-('ORD022', '2025-03-07', 'Lunch rush order'),
-('ORD023', '2025-03-07', 'Dinner rush order'),
-('ORD024', '2025-03-07', 'Late night order'),
-('ORD025', '2025-03-07', 'Early morning order'),
-('ORD026', '2025-03-07', 'Weekend special order'),
-('ORD027', '2025-03-07', 'Weekday lunch order'),
-('ORD028', '2025-03-07', 'Takeout bulk order'),
-('ORD029', '2025-03-07', 'Dine-in quick order'),
-('ORD030', '2025-03-07', 'Large party order'),
-('ORD031', '2025-03-07', 'Solo takeout order'),
-('ORD032', '2025-03-07', 'Family dine-in order'),
-('ORD033', '2025-03-07', 'Group takeout order'),
-('ORD034', '2025-03-07', 'Special event order'),
-('ORD035', '2025-03-07', 'Custom meal order'),
-('ORD036', '2025-03-07', 'Quick dine-in order'),
-('ORD037', '2025-03-07', 'Bulk takeout order'),
-('ORD038', '2025-03-07', 'Party catering order'),
-('ORD039', '2025-03-07', 'Regular dine-in order'),
-('ORD040', '2025-03-07', 'Special takeout order'),
-('ORD041', '2025-03-07', 'Combo dine-in order'),
-('ORD042', '2025-03-07', 'Quick takeout order'),
-('ORD043', '2025-03-07', 'Group dine-in order'),
-('ORD044', '2025-03-07', 'Individual takeout order'),
-('ORD045', '2025-03-07', 'Event dine-in order'),
-('ORD046', '2025-03-07', 'Combo takeout order'),
-('ORD047', '2025-03-07', 'Family takeout order'),
-('ORD048', '2025-03-07', 'Lunch dine-in order'),
-('ORD049', '2025-03-07', 'Dinner takeout order'),
-('ORD050', '2025-03-07', 'Breakfast dine-in order'),
-('ORD051', '2025-03-07', 'Snack takeout order'),
-('ORD052', '2025-03-07', 'Bulk dine-in order'),
-('ORD053', '2025-03-07', 'Party takeout order'),
-('ORD054', '2025-03-07', 'Regular dine-in order'),
-('ORD055', '2025-03-07', 'Special takeout order'),
-('ORD056', '2025-03-07', 'Combo dine-in order'),
-('ORD057', '2025-03-07', 'Quick takeout order'),
-('ORD058', '2025-03-07', 'Group dine-in order'),
-('ORD059', '2025-03-07', 'Individual takeout order'),
-('ORD060', '2025-03-07', 'Event dine-in order'),
-('ORD061', '2025-03-07', 'Combo takeout order'),
-('ORD062', '2025-03-07', 'Family dine-in order'),
-('ORD063', '2025-03-07', 'Lunch takeout order'),
-('ORD064', '2025-03-07', 'Dinner dine-in order'),
-('ORD065', '2025-03-07', 'Breakfast takeout order'),
-('ORD066', '2025-03-07', 'Snack dine-in order'),
-('ORD067', '2025-03-07', 'Bulk takeout order'),
-('ORD068', '2025-03-07', 'Party dine-in order'),
-('ORD069', '2025-03-07', 'Regular takeout order'),
-('ORD070', '2025-03-07', 'Special dine-in order'),
-('ORD071', '2025-03-07', 'Combo takeout order'),
-('ORD072', '2025-03-07', 'Quick dine-in order'),
-('ORD073', '2025-03-07', 'Group takeout order'),
-('ORD074', '2025-03-07', 'Individual dine-in order'),
-('ORD075', '2025-03-07', 'Event takeout order');
+INSERT INTO `orders` (`OrderID`, `order_date`, `status`, `order_description`) VALUES
+('ORD001', '2025-03-07', 'Active', 'No Description'),
+('ORD002', '2025-03-07', 'Active', 'No Description'),
+('ORD003', '2025-03-07', 'Active', 'No Description'),
+('ORD004', '2025-03-07', 'Active', 'No Description'),
+('ORD005', '2025-03-07', 'Active', 'No Description'),
+('ORD006', '2025-03-07', 'Active', 'No Description'),
+('ORD007', '2025-03-07', 'Active', 'No Description'),
+('ORD008', '2025-03-07', 'Active', 'No Description'),
+('ORD009', '2025-03-07', 'Active', 'No Description'),
+('ORD010', '2025-03-07', 'Active', 'No Description'),
+('ORD011', '2025-03-07', 'Active', 'No Description'),
+('ORD012', '2025-03-07', 'Active', 'No Description'),
+('ORD013', '2025-03-07', 'Active', 'No Description'),
+('ORD014', '2025-03-07', 'Active', 'No Description'),
+('ORD015', '2025-03-07', 'Active', 'No Description'),
+('ORD016', '2025-03-07', 'Active', 'No Description'),
+('ORD017', '2025-03-07', 'Active', 'No Description'),
+('ORD018', '2025-03-07', 'Active', 'No Description'),
+('ORD019', '2025-03-07', 'Active', 'No Description'),
+('ORD020', '2025-03-07', 'Active', 'No Description'),
+('ORD021', '2025-03-07', 'Active', 'No Description'),
+('ORD022', '2025-03-07', 'Active', 'No Description'),
+('ORD023', '2025-03-07', 'Active', 'No Description'),
+('ORD024', '2025-03-07', 'Active', 'No Description'),
+('ORD025', '2025-03-07', 'Active', 'No Description'),
+('ORD026', '2025-03-07', 'Active', 'No Description'),
+('ORD027', '2025-03-07', 'Active', 'No Description'),
+('ORD028', '2025-03-07', 'Active', 'No Description'),
+('ORD029', '2025-03-07', 'Active', 'No Description'),
+('ORD030', '2025-03-07', 'Active', 'No Description'),
+('ORD031', '2025-03-07', 'Active', 'No Description'),
+('ORD032', '2025-03-07', 'Active', 'No Description'),
+('ORD033', '2025-03-07', 'Active', 'No Description'),
+('ORD034', '2025-03-07', 'Active', 'No Description'),
+('ORD035', '2025-03-07', 'Active', 'No Description'),
+('ORD036', '2025-03-07', 'Active', 'No Description'),
+('ORD037', '2025-03-07', 'Active', 'No Description'),
+('ORD038', '2025-03-07', 'Active', 'No Description'),
+('ORD039', '2025-03-07', 'Active', 'No Description'),
+('ORD040', '2025-03-07', 'Active', 'No Description'),
+('ORD041', '2025-03-07', 'Active', 'No Description'),
+('ORD042', '2025-03-07', 'Active', 'No Description'),
+('ORD043', '2025-03-07', 'Active', 'No Description'),
+('ORD044', '2025-03-07', 'Active', 'No Description'),
+('ORD045', '2025-03-07', 'Active', 'No Description'),
+('ORD046', '2025-03-07', 'Active', 'No Description'),
+('ORD047', '2025-03-07', 'Active', 'No Description'),
+('ORD048', '2025-03-07', 'Active', 'No Description'),
+('ORD049', '2025-03-07', 'Active', 'No Description'),
+('ORD050', '2025-03-07', 'Active', 'No Description'),
+('ORD051', '2025-03-07', 'Active', 'No Description'),
+('ORD052', '2025-03-07', 'Active', 'No Description'),
+('ORD053', '2025-03-07', 'Active', 'No Description'),
+('ORD054', '2025-03-07', 'Active', 'No Description'),
+('ORD055', '2025-03-07', 'Active', 'No Description'),
+('ORD056', '2025-03-07', 'Active', 'No Description'),
+('ORD057', '2025-03-07', 'Active', 'No Description'),
+('ORD058', '2025-03-07', 'Active', 'No Description'),
+('ORD059', '2025-03-07', 'Active', 'No Description'),
+('ORD060', '2025-03-07', 'Active', 'No Description'),
+('ORD061', '2025-03-07', 'Active', 'No Description'),
+('ORD062', '2025-03-07', 'Active', 'No Description'),
+('ORD063', '2025-03-07', 'Active', 'No Description'),
+('ORD064', '2025-03-07', 'Active', 'No Description'),
+('ORD065', '2025-03-07', 'Active', 'No Description'),
+('ORD066', '2025-03-07', 'Active', 'No Description'),
+('ORD067', '2025-03-07', 'Active', 'No Description'),
+('ORD068', '2025-03-07', 'Active', 'No Description'),
+('ORD069', '2025-03-07', 'Active', 'No Description'),
+('ORD070', '2025-03-07', 'Active', 'No Description'),
+('ORD071', '2025-03-07', 'Active', 'No Description'),
+('ORD072', '2025-03-07', 'Active', 'No Description'),
+('ORD073', '2025-03-07', 'Active', 'No Description'),
+('ORD074', '2025-03-07', 'Active', 'No Description');
 
 --
 -- Triggers `orders`
 --
+DELIMITER $$
+CREATE TRIGGER `generate_receipt_after_order` AFTER INSERT ON `orders` FOR EACH ROW BEGIN
+    DECLARE total_price DECIMAL(10,2);
+
+    SELECT SUM(total_price) INTO total_price
+    FROM orderitems
+    WHERE OrderID = NEW.OrderID;
+
+    INSERT INTO receipt (ReceiptID, OrderID, price, payment_method, receipt_date, order_description)
+    VALUES (
+        CONCAT('R', SUBSTRING(NEW.OrderID, 4)),
+        NEW.OrderID,
+        total_price,
+        'Cash',
+        CURDATE(),
+        COALESCE(NEW.order_description, 'No Description')
+    );
+END
+$$
+DELIMITER ;
 DELIMITER $$
 CREATE TRIGGER `trig_date` BEFORE INSERT ON `orders` FOR EACH ROW SET NEW.order_date = CURDATE()
 $$
@@ -748,14 +800,14 @@ CREATE TABLE `products` (
   `ProductName` varchar(60) NOT NULL,
   `Price` decimal(10,2) NOT NULL,
   `Cost` decimal(10,2) NOT NULL,
-  `SupplierID` varchar(60) NOT NULL
+  `supplierID` varchar(15) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `products`
 --
 
-INSERT INTO `products` (`ProductID`, `ProductName`, `Price`, `Cost`, `SupplierID`) VALUES
+INSERT INTO `products` (`ProductID`, `ProductName`, `Price`, `Cost`, `supplierID`) VALUES
 ('P001', 'PARES', 80.00, 56.00, 'S001'),
 ('P002', 'Beef PARES', 80.00, 56.00, 'S002'),
 ('P003', 'OVERLOAD PARES', 100.00, 70.00, 'S003'),
@@ -837,93 +889,94 @@ CREATE TABLE `product_view` (
 --
 
 CREATE TABLE `receipt` (
-  `ReceiptID` varchar(10) NOT NULL,
-  `OrderID` varchar(10) NOT NULL,
+  `ReceiptID` varchar(15) NOT NULL,
+  `OrderID` varchar(15) NOT NULL,
   `price` decimal(10,2) DEFAULT NULL,
   `payment_method` varchar(20) NOT NULL,
-  `receipt_date` date NOT NULL
+  `receipt_date` date NOT NULL,
+  `order_description` text NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `receipt`
 --
 
-INSERT INTO `receipt` (`ReceiptID`, `OrderID`, `price`, `payment_method`, `receipt_date`) VALUES
-('R001', 'ORD001', 190.00, 'Cash', '2025-03-07'),
-('R002', 'ORD002', 125.00, 'Card', '2025-03-07'),
-('R003', 'ORD003', 480.00, 'Cash', '2025-03-07'),
-('R004', 'ORD004', 140.00, 'Card', '2025-03-07'),
-('R005', 'ORD005', 315.00, 'Cash', '2025-03-07'),
-('R006', 'ORD006', 125.00, 'Card', '2025-03-07'),
-('R007', 'ORD007', 215.00, 'Cash', '2025-03-07'),
-('R008', 'ORD008', 145.00, 'Card', '2025-03-07'),
-('R009', 'ORD009', 220.00, 'Cash', '2025-03-07'),
-('R010', 'ORD010', 75.00, 'Card', '2025-03-07'),
-('R011', 'ORD011', 125.00, 'Cash', '2025-03-07'),
-('R012', 'ORD012', 120.00, 'Card', '2025-03-07'),
-('R013', 'ORD013', 100.00, 'Cash', '2025-03-07'),
-('R014', 'ORD014', 110.00, 'Card', '2025-03-07'),
-('R015', 'ORD015', 100.00, 'Cash', '2025-03-07'),
-('R016', 'ORD016', 100.00, 'Card', '2025-03-07'),
-('R017', 'ORD017', 190.00, 'Cash', '2025-03-07'),
-('R018', 'ORD018', 210.00, 'Card', '2025-03-07'),
-('R019', 'ORD019', 375.00, 'Cash', '2025-03-07'),
-('R020', 'ORD020', 200.00, 'Card', '2025-03-07'),
-('R021', 'ORD021', 495.00, 'Cash', '2025-03-07'),
-('R022', 'ORD022', 380.00, 'Card', '2025-03-07'),
-('R023', 'ORD023', 320.00, 'Cash', '2025-03-07'),
-('R024', 'ORD024', 300.00, 'Card', '2025-03-07'),
-('R025', 'ORD025', 185.00, 'Cash', '2025-03-07'),
-('R026', 'ORD026', 310.00, 'Card', '2025-03-07'),
-('R027', 'ORD027', 255.00, 'Cash', '2025-03-07'),
-('R028', 'ORD028', 340.00, 'Card', '2025-03-07'),
-('R029', 'ORD029', 290.00, 'Cash', '2025-03-07'),
-('R030', 'ORD030', 540.00, 'Card', '2025-03-07'),
-('R031', 'ORD031', 180.00, 'Cash', '2025-03-07'),
-('R032', 'ORD032', 250.00, 'Card', '2025-03-07'),
-('R033', 'ORD033', 165.00, 'Cash', '2025-03-07'),
-('R034', 'ORD034', 230.00, 'Card', '2025-03-07'),
-('R035', 'ORD035', 160.00, 'Cash', '2025-03-07'),
-('R036', 'ORD036', 90.00, 'Card', '2025-03-07'),
-('R037', 'ORD037', 95.00, 'Cash', '2025-03-07'),
-('R038', 'ORD038', 135.00, 'Card', '2025-03-07'),
-('R039', 'ORD039', 110.00, 'Cash', '2025-03-07'),
-('R040', 'ORD040', 125.00, 'Card', '2025-03-07'),
-('R041', 'ORD041', 100.00, 'Cash', '2025-03-07'),
-('R042', 'ORD042', 110.00, 'Card', '2025-03-07'),
-('R043', 'ORD043', 200.00, 'Cash', '2025-03-07'),
-('R044', 'ORD044', 220.00, 'Card', '2025-03-07'),
-('R045', 'ORD045', 395.00, 'Cash', '2025-03-07'),
-('R046', 'ORD046', 210.00, 'Card', '2025-03-07'),
-('R047', 'ORD047', 495.00, 'Cash', '2025-03-07'),
-('R048', 'ORD048', 380.00, 'Card', '2025-03-07'),
-('R049', 'ORD049', 320.00, 'Cash', '2025-03-07'),
-('R050', 'ORD050', 300.00, 'Card', '2025-03-07'),
-('R051', 'ORD051', 185.00, 'Cash', '2025-03-06'),
-('R052', 'ORD052', 310.00, 'Card', '2025-03-06'),
-('R053', 'ORD053', 255.00, 'Cash', '2025-03-06'),
-('R054', 'ORD054', 340.00, 'Card', '2025-03-06'),
-('R055', 'ORD055', 290.00, 'Cash', '2025-03-06'),
-('R056', 'ORD056', 540.00, 'Card', '2025-03-06'),
-('R057', 'ORD057', 180.00, 'Cash', '2025-03-06'),
-('R058', 'ORD058', 250.00, 'Card', '2025-03-06'),
-('R059', 'ORD059', 165.00, 'Cash', '2025-03-06'),
-('R060', 'ORD060', 230.00, 'Card', '2025-03-06'),
-('R061', 'ORD061', 160.00, 'Cash', '2025-03-06'),
-('R062', 'ORD062', 90.00, 'Card', '2025-03-06'),
-('R063', 'ORD063', 95.00, 'Cash', '2025-03-06'),
-('R064', 'ORD064', 135.00, 'Card', '2025-03-06'),
-('R065', 'ORD065', 110.00, 'Cash', '2025-03-06'),
-('R066', 'ORD066', 125.00, 'Card', '2025-03-06'),
-('R067', 'ORD067', 100.00, 'Cash', '2025-03-06'),
-('R068', 'ORD068', 110.00, 'Card', '2025-03-06'),
-('R069', 'ORD069', 200.00, 'Cash', '2025-03-06'),
-('R070', 'ORD070', 220.00, 'Card', '2025-03-06'),
-('R071', 'ORD071', 395.00, 'Cash', '2025-03-06'),
-('R072', 'ORD072', 210.00, 'Card', '2025-03-06'),
-('R073', 'ORD073', 495.00, 'Cash', '2025-03-06'),
-('R074', 'ORD074', 380.00, 'Card', '2025-03-06'),
-('R075', 'ORD075', 320.00, 'Cash', '2025-03-06');
+INSERT INTO `receipt` (`ReceiptID`, `OrderID`, `price`, `payment_method`, `receipt_date`, `order_description`) VALUES
+('R001', 'ORD001', 190.00, 'Cash', '2025-03-07', ''),
+('R002', 'ORD002', 125.00, 'Card', '2025-03-07', ''),
+('R003', 'ORD003', 480.00, 'Cash', '2025-03-07', ''),
+('R004', 'ORD004', 140.00, 'Card', '2025-03-07', ''),
+('R005', 'ORD005', 315.00, 'Cash', '2025-03-07', ''),
+('R006', 'ORD006', 125.00, 'Card', '2025-03-07', ''),
+('R007', 'ORD007', 215.00, 'Cash', '2025-03-07', ''),
+('R008', 'ORD008', 145.00, 'Card', '2025-03-07', ''),
+('R009', 'ORD009', 220.00, 'Cash', '2025-03-07', ''),
+('R010', 'ORD010', 75.00, 'Card', '2025-03-07', ''),
+('R011', 'ORD011', 125.00, 'Cash', '2025-03-07', ''),
+('R012', 'ORD012', 120.00, 'Card', '2025-03-07', ''),
+('R013', 'ORD013', 100.00, 'Cash', '2025-03-07', ''),
+('R014', 'ORD014', 110.00, 'Card', '2025-03-07', ''),
+('R015', 'ORD015', 100.00, 'Cash', '2025-03-07', ''),
+('R016', 'ORD016', 100.00, 'Card', '2025-03-07', ''),
+('R017', 'ORD017', 190.00, 'Cash', '2025-03-07', ''),
+('R018', 'ORD018', 210.00, 'Card', '2025-03-07', ''),
+('R019', 'ORD019', 375.00, 'Cash', '2025-03-07', ''),
+('R020', 'ORD020', 200.00, 'Card', '2025-03-07', ''),
+('R021', 'ORD021', 495.00, 'Cash', '2025-03-07', ''),
+('R022', 'ORD022', 380.00, 'Card', '2025-03-07', ''),
+('R023', 'ORD023', 320.00, 'Cash', '2025-03-07', ''),
+('R024', 'ORD024', 300.00, 'Card', '2025-03-07', ''),
+('R025', 'ORD025', 185.00, 'Cash', '2025-03-07', ''),
+('R026', 'ORD026', 310.00, 'Card', '2025-03-07', ''),
+('R027', 'ORD027', 255.00, 'Cash', '2025-03-07', ''),
+('R028', 'ORD028', 340.00, 'Card', '2025-03-07', ''),
+('R029', 'ORD029', 290.00, 'Cash', '2025-03-07', ''),
+('R030', 'ORD030', 540.00, 'Card', '2025-03-07', ''),
+('R031', 'ORD031', 180.00, 'Cash', '2025-03-07', ''),
+('R032', 'ORD032', 250.00, 'Card', '2025-03-07', ''),
+('R033', 'ORD033', 165.00, 'Cash', '2025-03-07', ''),
+('R034', 'ORD034', 230.00, 'Card', '2025-03-07', ''),
+('R035', 'ORD035', 160.00, 'Cash', '2025-03-07', ''),
+('R036', 'ORD036', 90.00, 'Card', '2025-03-07', ''),
+('R037', 'ORD037', 95.00, 'Cash', '2025-03-07', ''),
+('R038', 'ORD038', 135.00, 'Card', '2025-03-07', ''),
+('R039', 'ORD039', 110.00, 'Cash', '2025-03-07', ''),
+('R040', 'ORD040', 125.00, 'Card', '2025-03-07', ''),
+('R041', 'ORD041', 100.00, 'Cash', '2025-03-07', ''),
+('R042', 'ORD042', 110.00, 'Card', '2025-03-07', ''),
+('R043', 'ORD043', 200.00, 'Cash', '2025-03-07', ''),
+('R044', 'ORD044', 220.00, 'Card', '2025-03-07', ''),
+('R045', 'ORD045', 395.00, 'Cash', '2025-03-07', ''),
+('R046', 'ORD046', 210.00, 'Card', '2025-03-07', ''),
+('R047', 'ORD047', 495.00, 'Cash', '2025-03-07', ''),
+('R048', 'ORD048', 380.00, 'Card', '2025-03-07', ''),
+('R049', 'ORD049', 320.00, 'Cash', '2025-03-07', ''),
+('R050', 'ORD050', 300.00, 'Card', '2025-03-07', ''),
+('R051', 'ORD051', 185.00, 'Cash', '2025-03-06', ''),
+('R052', 'ORD052', 310.00, 'Card', '2025-03-06', ''),
+('R053', 'ORD053', 255.00, 'Cash', '2025-03-06', ''),
+('R054', 'ORD054', 340.00, 'Card', '2025-03-06', ''),
+('R055', 'ORD055', 290.00, 'Cash', '2025-03-06', ''),
+('R056', 'ORD056', 540.00, 'Card', '2025-03-06', ''),
+('R057', 'ORD057', 180.00, 'Cash', '2025-03-06', ''),
+('R058', 'ORD058', 250.00, 'Card', '2025-03-06', ''),
+('R059', 'ORD059', 165.00, 'Cash', '2025-03-06', ''),
+('R060', 'ORD060', 230.00, 'Card', '2025-03-06', ''),
+('R061', 'ORD061', 160.00, 'Cash', '2025-03-06', ''),
+('R062', 'ORD062', 90.00, 'Card', '2025-03-06', ''),
+('R063', 'ORD063', 95.00, 'Cash', '2025-03-06', ''),
+('R064', 'ORD064', 135.00, 'Card', '2025-03-06', ''),
+('R065', 'ORD065', 110.00, 'Cash', '2025-03-06', ''),
+('R066', 'ORD066', 125.00, 'Card', '2025-03-06', ''),
+('R067', 'ORD067', 100.00, 'Cash', '2025-03-06', ''),
+('R068', 'ORD068', 110.00, 'Card', '2025-03-06', ''),
+('R069', 'ORD069', 200.00, 'Cash', '2025-03-06', ''),
+('R070', 'ORD070', 220.00, 'Card', '2025-03-06', ''),
+('R071', 'ORD071', 395.00, 'Cash', '2025-03-06', ''),
+('R072', 'ORD072', 210.00, 'Card', '2025-03-06', ''),
+('R073', 'ORD073', 495.00, 'Cash', '2025-03-06', ''),
+('R074', 'ORD074', 380.00, 'Card', '2025-03-06', ''),
+('R075', 'ORD075', NULL, 'Cash', '2025-03-10', 'Customer Late Night Order');
 
 -- --------------------------------------------------------
 
@@ -932,7 +985,7 @@ INSERT INTO `receipt` (`ReceiptID`, `OrderID`, `price`, `payment_method`, `recei
 --
 
 CREATE TABLE `supplier` (
-  `supplierID` varchar(10) NOT NULL,
+  `supplierID` varchar(15) NOT NULL,
   `first_name` varchar(60) NOT NULL,
   `last_name` varchar(60) NOT NULL,
   `middle_initial` varchar(1) NOT NULL,
@@ -1005,7 +1058,7 @@ INSERT INTO `supplier` (`supplierID`, `first_name`, `last_name`, `middle_initial
 -- (See below for the actual view)
 --
 CREATE TABLE `supplier_view` (
-`supplierID` varchar(10)
+`supplierID` varchar(15)
 ,`supplierName` varchar(125)
 ,`contact_person` varchar(60)
 ,`address` varchar(60)
@@ -1075,7 +1128,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `inventory_view`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory_view`  AS SELECT `i`.`InventoryID` AS `InventoryID`, `p`.`ProductName` AS `ProductName`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierName`, `i`.`stock_quantity` AS `stock_quantity`, `i`.`stock_date` AS `stock_date`, `i`.`availability` AS `availability` FROM ((`inventory` `i` join `products` `p` on(`i`.`ProductID` = `p`.`ProductID`)) join `supplier` `s` on(`p`.`SupplierID` = `s`.`supplierID`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `inventory_view`  AS SELECT `i`.`InventoryID` AS `InventoryID`, `p`.`ProductName` AS `ProductName`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierName`, `i`.`stock_quantity` AS `stock_quantity`, `i`.`stock_date` AS `stock_date`, `i`.`availability` AS `availability` FROM ((`inventory` `i` join `products` `p` on(`i`.`ProductID` = `p`.`ProductID`)) join `supplier` `s` on(`p`.`supplierID` = `s`.`supplierID`)) ;
 
 -- --------------------------------------------------------
 
@@ -1102,7 +1155,7 @@ CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW 
 --
 DROP TABLE IF EXISTS `product_view`;
 
-CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `product_view`  AS SELECT `p`.`ProductID` AS `ProductID`, `p`.`ProductName` AS `ProductName`, `p`.`Price` AS `Price`, `p`.`Cost` AS `Cost`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierID` FROM (`products` `p` join `supplier` `s` on(`p`.`SupplierID` = `s`.`supplierID`)) ;
+CREATE ALGORITHM=UNDEFINED DEFINER=`root`@`localhost` SQL SECURITY DEFINER VIEW `product_view`  AS SELECT `p`.`ProductID` AS `ProductID`, `p`.`ProductName` AS `ProductName`, `p`.`Price` AS `Price`, `p`.`Cost` AS `Cost`, concat(`s`.`last_name`,', ',`s`.`first_name`,' ',`s`.`middle_initial`,'.') AS `SupplierID` FROM (`products` `p` join `supplier` `s` on(`p`.`supplierID` = `s`.`supplierID`)) ;
 
 -- --------------------------------------------------------
 
@@ -1178,7 +1231,7 @@ ALTER TABLE `ordersupply`
 --
 ALTER TABLE `products`
   ADD PRIMARY KEY (`ProductID`),
-  ADD KEY `fk_suppler_id` (`SupplierID`);
+  ADD KEY `fk_suppler_id` (`supplierID`);
 
 --
 -- Indexes for table `supplier`
@@ -1222,7 +1275,7 @@ ALTER TABLE `inventory`
 -- Constraints for table `products`
 --
 ALTER TABLE `products`
-  ADD CONSTRAINT `fk_suppler_id` FOREIGN KEY (`SupplierID`) REFERENCES `supplier` (`supplierID`) ON DELETE CASCADE ON UPDATE CASCADE;
+  ADD CONSTRAINT `fk_suppler_id` FOREIGN KEY (`supplierID`) REFERENCES `supplier` (`supplierID`) ON DELETE CASCADE ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

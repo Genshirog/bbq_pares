@@ -148,45 +148,5 @@ public class SceneManager {
         }
     }
 
-    public void show_order_history() {
-        OrderList orderlist = new OrderList(this);
-        orderlist.getRoot().setOpacity(0);
-        Scene app_scene = orderlist.getScene();
 
-        if (currentRoot != null) {
-            FadeTransition fadeOut = new FadeTransition(Duration.millis(800), currentRoot);
-            fadeOut.setFromValue(1.0);
-            fadeOut.setToValue(0.0);
-
-            fadeOut.setOnFinished(e -> {
-                stage.setScene(app_scene);
-                stage.setResizable(true);
-                stage.setMaximized(false);
-                stage.setMaximized(true);
-                stage.setResizable(false);
-
-                FadeTransition fadeIn = new FadeTransition(Duration.millis(800), orderlist.getRoot());
-                fadeIn.setFromValue(0.0);
-                fadeIn.setToValue(1.0);
-                fadeIn.play();
-
-                currentRoot = orderlist.getRoot();
-            });
-
-            fadeOut.play();
-        } else {
-            stage.setScene(app_scene);
-            stage.setResizable(true);
-            stage.setMaximized(false);
-            stage.setMaximized(true);
-            stage.setResizable(false);
-            FadeTransition fadeIn = new FadeTransition(Duration.millis(800), orderlist.getRoot());
-            fadeIn.setFromValue(0.0);
-            fadeIn.setToValue(1.0);
-            fadeIn.play();
-
-            currentRoot = orderlist.getRoot();
-        }
-    }
-    
 }

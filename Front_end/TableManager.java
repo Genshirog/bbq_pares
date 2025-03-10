@@ -343,7 +343,7 @@ public class TableManager {
         // Columns
         TableColumn<MenuItem, String> codeCol = new TableColumn<>("Code");
         codeCol.setCellValueFactory(new PropertyValueFactory<>("code"));
-        codeCol.setPrefWidth(180);
+        codeCol.setPrefWidth(150);
         codeCol.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-alignment: CENTER;");
         codeCol.setReorderable(false);
         codeCol.setResizable(false);
@@ -351,7 +351,7 @@ public class TableManager {
 
         TableColumn<MenuItem, String> nameCol = new TableColumn<>("Name");
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
-        nameCol.setPrefWidth(280);
+        nameCol.setPrefWidth(250);
         nameCol.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-alignment: CENTER;");
         nameCol.setReorderable(false);
         nameCol.setResizable(false);
@@ -359,7 +359,7 @@ public class TableManager {
 
         TableColumn<MenuItem, Double> priceCol = new TableColumn<>("Price");
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
-        priceCol.setPrefWidth(280);
+        priceCol.setPrefWidth(150);
         priceCol.setStyle("-fx-font-size: 15px; -fx-font-weight: bold; -fx-alignment: CENTER;");
         priceCol.setReorderable(false);
         priceCol.setResizable(false);

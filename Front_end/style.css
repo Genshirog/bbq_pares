@@ -424,7 +424,7 @@
 
 .menu-container {
     -fx-background-color: rgba(255, 255, 255, 0.8);
-    -fx-padding: 15px;
+    -fx-padding: 20px;
     -fx-background-radius: 10px;
     -fx-alignment: center-left;
 }
@@ -494,32 +494,56 @@
     -fx-text-fill: black;
 }
 
-/*orderlist*/
 
-#OrderList {
-    -fx-background-color: rgba(255, 255, 255, 0.9); /* White background */
-    -fx-pref-width: 600px;
-    -fx-pref-height: 400px;
-    -fx-max-width: 600px;
-    -fx-max-height: 400px;
-    -fx-padding: 10px;
+/*CancelOrder STYLE*/
+.cancellation-layout {
+    -fx-border-width: 2px;
+    -fx-border-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(three-pass-box, rgba(0, 0, 0, 0.2), 10, 0, 0, 0);
 }
 
-#OrderList .column-header {
-    -fx-background-color: #f0f0f0;
+/* HBox containing the Order ID label and fetch button */
+.cancellation-orderid-box {
+    -fx-background-color: transparent;
+    -fx-padding: 50px;
+    -fx-spacing: 10px;
+}
+
+.cancellation-textfield {
+    -fx-text-fill: white;
+    -fx-font-size: 20px;
+}
+
+/* Label for "Order ID:" */
+.cancellation-label {
+    -fx-font-size: 20px;
     -fx-font-weight: bold;
-    -fx-alignment: CENTER;
+    -fx-text-fill: #FFFFFF;
 }
 
-#OrderList .table-row-cell:odd {
+/* VBox containing the order items*/
+.cancellation-items-box {
     -fx-background-color: rgba(245, 245, 245, 0.9);
+    -fx-pref-width: 800px;
+    -fx-alignment: center;
+    -fx-padding: 10px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
 }
 
-#OrderList .table-row-cell:even {
-    -fx-background-color: rgba(255, 255, 255, 0.9);
+/* Total label */
+.cancellation-total-label {
+    -fx-background-color: rgba(245, 245, 245, 0.9);
+    -fx-padding: 5px;
+    -fx-border-width: 1px;
+    -fx-border-radius: 5px;
 }
 
-#OrderList .table-row-cell:selected {
-    -fx-background-color: rgba(284, 118, 67, 0.77);
-    -fx-text-fill: black;
+/* HBox containing the Cancel and Back buttons */
+.cancellation-button-box {
+    -fx-background-color: transparent;
+    -fx-padding: 10px;
+    -fx-spacing: 10px;
 }
+
